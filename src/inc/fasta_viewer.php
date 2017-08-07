@@ -2,6 +2,7 @@
 use pgb_liv\php_ms\Reader\FastaReader;
 
 ?>
+<h2>FASTA Viewer</h2>
 <form enctype="multipart/form-data" action="?page=fasta_viewer"
     method="POST">
     FASTA File: <input name="fasta" type="file" /><br /> <input
@@ -38,8 +39,8 @@ if (isset($_FILES['fasta'])) {
             echo '</td><td>';
             echo $protein->getSequenceVersion();
             echo '</td></tr>';
-            echo '<tr><td colspan="5" style="font-family: monospace;">';
-            echo wordwrap($protein->getSequence(), 120, '<br />', true);
+            echo '<tr><td colspan="5" style="font-family: monospace; font-size: 0.9em; padding-left: 1em;">';
+            echo wordwrap($protein->getSequence(), 80, '<br />', true);
             echo '</td></tr>';
         }
     }

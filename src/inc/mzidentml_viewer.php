@@ -4,10 +4,18 @@ use pgb_liv\php_ms\Reader\MzIdentMlReader1r1;
 
 set_time_limit(600);
 ?>
+<h2>MzIdentML Viewer</h2>
+
 <form enctype="multipart/form-data" action="?page=mzidentml_viewer"
     method="POST">
-    MzIdentML File: <input name="mzidentml" type="file" /><br /> <input
-        type="submit" value="Send File" /><br />
+    <fieldset>
+        <label for="file">MzIdentML File</label> <input name="mzidentml"
+            type="file" id="file" /> (.gz or .mzid supported)
+    </fieldset>
+
+    <fieldset>
+        <input type="submit" value="Send File" />
+    </fieldset>
 </form>
 <?php
 

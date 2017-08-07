@@ -2,6 +2,7 @@
 use pgb_liv\php_ms\Reader\MgfReader;
 
 ?>
+<h2>MGF Viewer</h2>
 <form enctype="multipart/form-data" action="?page=mgf_viewer"
     method="POST">
     MGF File: <input name="mgf" type="file" /><br /> <input
@@ -14,7 +15,7 @@ if (isset($_FILES['mgf'])) {
     
     $reader = new MgfReader($mgfFile);
     
-    echo '<table><thead><tr><th>Title</th><th>m/z</th><th>z</th><th>RT</th><th>Fragments</th></tr></thead><tbody>';
+    echo '<table class="formattedTable hoverableRow"><thead><tr><th>Title</th><th>m/z</th><th>z</th><th>RT</th><th>Fragments</th></tr></thead><tbody>';
     
     foreach ($reader as $spectra) {
         echo '<tr><td>';

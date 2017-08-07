@@ -61,34 +61,64 @@ if (isset($_FILES['fasta'])) {
     exit();
 }
 ?>
+<h2>MGF Filter</h2>
+<p>This tool allows you to upload an MGF file and filter it by the specified options. A new MGF file will be generated that you can download.</p>
+
 <form enctype="multipart/form-data"
     action="?page=mgf_filter&amp;txtonly=1" method="POST">
-    MGF File: <input name="fasta" type="file" /><br /> Charge Range: <select
-        name="charge_min">
-        <option>ANY</option>
-        <option>1</option>
-        <option>2</option>
-        <option>3</option>
-        <option>4</option>
-        <option>5</option>
-        <option>6</option>
-        <option>7</option>
-        <option>8</option>
-        <option>9</option>
-    </select>- <select name="charge_max">
-        <option>ANY</option>
-        <option>1</option>
-        <option>2</option>
-        <option>3</option>
-        <option>4</option>
-        <option>5</option>
-        <option>6</option>
-        <option>7</option>
-        <option>8</option>
-        <option>9</option>
-    </select><br /> RT Range: <input type="text" name="rt_min" value="" />-<input
-        type="text" name="rt_max" value="" /><br /> Mass Range: <input
-        type="text" name="mass_min" value="" />-<input type="text"
-        name="mass_max" value="" /><br /> <input type="submit"
-        value="Send File" /><br />
+
+    <fieldset>
+        <label for="file">MGF File</label><input name="fasta"
+            type="file" />
+    </fieldset>
+    <fieldset>
+        <label for="minCharge">Min Charge</label><select
+            name="charge_min" id="minCharge">
+            <option>ANY</option>
+            <option>1</option>
+            <option>2</option>
+            <option>3</option>
+            <option>4</option>
+            <option>5</option>
+            <option>6</option>
+            <option>7</option>
+            <option>8</option>
+            <option>9</option>
+        </select>
+    </fieldset>
+    <fieldset>
+        <label for="maxCharge">Max Charge</label><select
+            name="charge_max" id="maxCharge">
+            <option>ANY</option>
+            <option>1</option>
+            <option>2</option>
+            <option>3</option>
+            <option>4</option>
+            <option>5</option>
+            <option>6</option>
+            <option>7</option>
+            <option>8</option>
+            <option>9</option>
+        </select>
+    </fieldset>
+    <fieldset>
+        <label for="minRt">Min RT</label>
+        
+        <input type="text" name="rt_min"
+            id="minRt">
+    </fieldset>
+    <fieldset>
+        <label for="maxRt">Max RT</label><input type="text" name="rt_max"
+            id="maxRt">
+    </fieldset>
+    <fieldset>
+        <label for="minMass">Min Mass</label><input type="text" name="mass_min"
+            id="minMass">
+    </fieldset>
+    <fieldset>
+        <label for="maxMass">Max Mass</label><input type="text" name="mass_max"
+            id="maxMass">
+    </fieldset>
+
+    <input type="submit" value="Upload MGF" />
 </form>

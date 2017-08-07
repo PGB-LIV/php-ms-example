@@ -29,7 +29,8 @@ if (isset($_POST['massB'])) {
 }
 ?>
 
-<h2>Convert Tolerance</h2>
+<h2>Tolerance Calculator</h2>
+<h3>Convert Tolerance</h3>
 <form method="post" action="?page=tolerance_calc">
     Mass: <input type="text" name='mass' value="<?php echo $mass; ?>" />Da<br />
     Tolerance Value: <input type="text" name='tolVal'
@@ -40,15 +41,20 @@ if (isset($_POST['massB'])) {
             <?php echo $toleranceUnit == 'Da' ? 'selected="selected"' : ''; ?>>Da</option>
     </select><br /> <input type="submit" />
 </form>
+
+<p class="centreText">
 <?php
 $tolerance = new Tolerance($toleranceValue, $toleranceUnit);
 
-echo $mass . 'Da<br />';
-echo $toleranceValue . ' ' . $toleranceUnit . ' = ' . $tolerance->getDaltonDelta($mass) . ' Da<br />';
-echo $toleranceValue . ' ' . $toleranceUnit . ' = ' . $tolerance->getPpmDelta($mass) . ' ppm';
-?>
+echo 'For <strong>' . $mass . 'Da</strong><br />';
+if ($toleranceUnit == Tolerance::PPM) {
+    echo '<strong>' . $toleranceValue . ' ' . $toleranceUnit . '</strong> is equivalent to <strong>' . $tolerance->getDaltonDelta($mass) . ' Da</strong><br />';
+} else {
+    echo '<strong>' . $toleranceValue . ' ' . $toleranceUnit . '</strong> is equivalent to <strong>' . $tolerance->getPpmDelta($mass) . ' ppm</strong>';
+}
+?></p>
 
-<h2>Calculate Difference</h2>
+<h3>Calculate Difference</h3>
 
 <form method="post" action="?page=tolerance_calc">
     Mass A: <input type="text" name='massA'
@@ -56,10 +62,12 @@ echo $toleranceValue . ' ' . $toleranceUnit . ' = ' . $tolerance->getPpmDelta($m
         type="text" name='massB' value="<?php echo $massB; ?>" />Da<br />
     <input type="submit" />
 </form>
+
+<p class="centreText">
 <?php
 $tolerance = new Tolerance(abs($massA - $massB), Tolerance::DA);
 
-echo $massA . 'Da - ' . $massB . 'Da = <br />';
-echo round($tolerance->getDaltonDelta($massB), 5) . ' Da<br />';
-echo round($tolerance->getPpmDelta($massB), 5) . ' ppm';
-?>
+echo 'The mass difference of <strong>'.$massA . 'Da</strong> and <strong>' . $massB . 'Da</strong><br />';
+echo 'In Daltons, <strong>'.round($tolerance->getDaltonDelta($massB), 5) . ' Da</strong><br />';
+echo 'In ppm, <strong>'.round($tolerance->getPpmDelta($massB), 5) . ' ppm</strong>';
+?></p>

@@ -3,26 +3,11 @@ use pgb_liv\php_ms\Utility\Digest\DigestFactory;
 use pgb_liv\php_ms\Reader\FastaReader;
 use pgb_liv\php_ms\Core\Tolerance;
 use pgb_liv\php_ms\Utility\Filter\FilterMass;
-?>
-<form enctype="multipart/form-data" action="?page=protein_digest"
-    method="POST">
-    FASTA File: <input name="fasta" type="file" /><br /> Enzyme: <select
-        name="enzyme">
-        <?php
-        foreach (DigestFactory::getEnzymes() as $key => $enzyme) {
-            echo '<option value="' . $key . '">' . $enzyme . '</option>';
-        }
-        ?>
-        
-    </select><br /> NME: <input type="checkbox" name="nme" value="1" /><br />
-    Missed Cleavages: <input type="text" name="missedcleave" value="1" /><br />
-    Peptide Mass: <input type="text" name="mass" value="0" /> (If 0,
-    filter unused)<br /> Mass Tolerance: <input type="text" name="ppm"
-        value="5" /> ppm<br /> <input type="submit" value="Send File" /><br />
-</form>
 
-<?php
 if (isset($_FILES['fasta'])) {
+    header('Content-type: text/plain;');
+    header('Content-Disposition: attachment; filename="' . $_FILES['fasta']['name'] . '.csv"');
+    
     $fastaFile = $_FILES['fasta']['tmp_name'];
     
     $reader = new FastaReader($fastaFile);
@@ -35,7 +20,7 @@ if (isset($_FILES['fasta'])) {
     }
     
     $filter = null;
-    if ($_POST['mass'] != 0) {
+    if (strlen($_POST['mass']) > 0 && $_POST['mass'] != 0) {
         $tolerance = new Tolerance((float) $_POST['ppm'], Tolerance::PPM);
         $minMass = $_POST['mass'] - $tolerance->getDaltonDelta((float) $_POST['mass']);
         $maxMass = $_POST['mass'] + $tolerance->getDaltonDelta((float) $_POST['mass']);
@@ -44,7 +29,6 @@ if (isset($_FILES['fasta'])) {
     }
     
     foreach ($reader as $protein) {
-        $headerShown = false;
         
         $peptides = $digest->digest($protein);
         foreach ($peptides as $peptide) {
@@ -52,13 +36,53 @@ if (isset($_FILES['fasta'])) {
                 continue;
             }
             
-            if (! $headerShown) {
-                echo '<hr />';
-                echo '<strong>' . $protein->getUniqueIdentifier() . '</strong><br />';
-                $headerShown = true;
-            }
-            
-            echo ' ' . $peptide->getSequence() . ' ' . $peptide->getMass() . '<br />';
+            echo $protein->getUniqueIdentifier() . ',' . $peptide->getSequence() . ',' . $peptide->getMass() . "\n";
         }
     }
+    
+    exit();
 }
+?>
+<h2>Protein Digestion</h2>
+
+<p>This tool allows you to upload a FASTA file and to generate a list of peptides as would be produced by the chosen enzyme. You may filter the peptides to those within a certain mass. The output will be a .csv file.</p>
+
+<form enctype="multipart/form-data" action="?page=protein_digest&amp;txtonly=1"
+    method="POST">
+
+    <fieldset>
+        <label for="fasta">FASTA File</label> <input name="fasta"
+            type="file" id="fasta" />
+    </fieldset>
+
+    <fieldset>
+        <label for="enzyme">Enzyme</label> <select name="enzyme"
+            id="enzyme">
+        <?php
+        foreach (DigestFactory::getEnzymes() as $key => $enzyme) {
+            echo '<option value="' . $key . '">' . $enzyme . '</option>';
+        }
+        ?>        
+    </select>
+    </fieldset>
+
+    <fieldset>
+        <label for="nme">NME</label><input type="checkbox" name="nme"
+            id="nme" value="1" />
+    </fieldset>
+
+    <fieldset>
+        <label for="missedCleave">Missed Cleavages</label><input
+            type="text" name="missedcleave" id="missedCleave" value="1" />
+    </fieldset>
+
+    <fieldset>
+        <label for="mass">Mass Value</label> <input type="text"
+            name="mass" id="mass" value="" /> &plusmn; <input
+            type="text" name="ppm" id="ppm" value="5" class="smallInput" />
+        ppm
+    </fieldset>
+
+    <input type="submit" value="Send File" />
+
+</form>

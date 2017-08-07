@@ -6,20 +6,24 @@ use pgb_liv\php_ms\Utility\Fragment\YFragment;
 use pgb_liv\php_ms\Utility\Fragment\CFragment;
 
 $sequence = 'PEPTIDE';
-if (isset($_POST['sequence'])) {
-    $sequence = $_POST['sequence'];
+if (isset($_REQUEST['sequence'])) {
+    $sequence = $_REQUEST['sequence'];
 }
 ?>
+<h2>Peptide Properties</h2>
 
-<form method="post" action="?page=peptide_properties">
-    Sequence: <input type="text" name='sequence'
-        value="<?php echo $sequence; ?>" /> <input type="submit" />
+
+<form method="get" action="#">
+    <input type="hidden" name="page" value="peptide_properties" /> <label
+        for="sequence">Sequence</label> <input type="text" id="sequence"
+        name="sequence" value="<?php echo $sequence; ?>" /> <input
+        type="submit" value="Submit" />
 </form>
 <?php
 
 $peptide = new Peptide($sequence);
 
-echo 'Sequence: ' . $peptide->getSequence() . '<br />';
+echo '<h3>' . $peptide->getSequence() . '</h3>';
 echo 'Length: ' . $peptide->getLength() . '<br />';
 echo 'Mass: ' . $peptide->getMass() . 'Da<br />';
 echo 'Formula: ' . $peptide->getMolecularFormula() . '<br /><br />';
@@ -31,7 +35,9 @@ $frags['C Ions'] = new CFragment($peptide);
 $frags['Y Ions'] = new YFragment($peptide);
 
 ?>
-<table>
+<h3>Fragments</h3>
+
+<table class="formattedTable hoverableRow">
     <thead>
     <?php
     echo '<tr>';
