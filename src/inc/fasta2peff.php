@@ -73,10 +73,13 @@ if (! empty($_FILES)) {
 
     <form enctype="multipart/form-data" action="?page=fasta2peff&amp;txtonly=1"
         method="POST">
-        <!-- MAX_FILE_SIZE must precede the file input field -->
-        <input type="hidden" name="MAX_FILE_SIZE" value="10000000" />
-        <!-- Name of input element determines name in $_FILES array -->
-        Send this file: <input name="fasta" type="file" /> <input
-            type="submit" value="Send File" />
+    <fieldset>
+        <label for="fasta">FASTA File</label> <input name="fasta" id="fasta"
+            type="file" />
+    </fieldset>
+
+    <fieldset>
+        <input type="submit" value="Upload" />
+    </fieldset>
     </form>
 

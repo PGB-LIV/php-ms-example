@@ -51,6 +51,14 @@ if (! empty($_FILES)) {
     
     $reader = MzIdentMlReaderFactory::getReader($mzIdentMlFile);
     ?>
+<ul style="float: right;">
+    <li><a href="#software">Software</a></li>
+    <li><a href="#protocol">Protocol</a></li>
+    <li><a href="#peptides">Peptide Spectrum Matches</a></li>
+    <li><a href="#proteins">Protein Groups</a></li>
+</ul>
+
+<a name="software" />
 <h2>Software</h2>
 <?php
     foreach ($reader->getAnalysisSoftwareList() as $software) {
@@ -63,6 +71,7 @@ if (! empty($_FILES)) {
     }
     ?>
 
+<a name="protocol" />
 <h2>Protocol</h2>
 
 <?php
@@ -135,42 +144,70 @@ if (! empty($_FILES)) {
         }
     }
     ?>
-<h2>Results</h2>
-<table>
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Title</th>
-            <th>Peptide</th>
-            <th>Protein</th>
-            <th>m/z</th>
-            <th>Charge</th>
-            <th colspan="4">Scores</th>
-    
-    </thead>
-    <tbody>
+
+<a name="peptides" />
+<h2>Peptide Spectrum Matches</h2>
 <?php
-    foreach ($reader->getAnalysisData() as $key => $spectra) {
-        echo '<tr>';
-        echo '<td>' . $key . '</td>';
-        echo '<td>' . $spectra->getTitle() . '</td>';
-        echo '<td>' . current($spectra->getIdentifications())->getPeptide()->getSequence() . '</td>';
-        echo '<td>' . current($spectra->getIdentifications())->getPeptide()
-            ->getProtein()
-            ->getAccession() . '</td>';
-        echo '<td align="right">' . number_format($spectra->getMassCharge(), 4) . '</td>';
-        echo '<td align="right">' . $spectra->getCharge() . '</td>';
+    foreach ($reader->getAnalysisData() as $spectra) {
+        echo '<h3>' . $spectra->getTitle() . '</h3>';
         
-        foreach (current($spectra->getIdentifications())->getScores() as $score) {
-            echo '<td align="right">' . $score . '</td>';
+        echo '<ul style="float: right;">';
+        echo '<li>m/z: ' . number_format($spectra->getMassCharge(), 4) . 'Da</li>';
+        echo '<li>Mass: ' . number_format($spectra->getMass(), 4) . 'Da</li>';
+        echo '<li>Charge: ' . $spectra->getCharge() . '</li>';
+        echo '</ul>';
+        
+        foreach ($spectra->getIdentifications() as $identification) {
+            echo '<h4 style="margin-left: 1em;">' . $identification->getPeptide()->getSequence() . ' <em>(' . $identification->getPeptide()
+                ->getProtein()
+                ->getAccession() . ')</em></h4>';
+            
+            echo '<ul style="float: left; margin-left: 1em;">';
+            
+            foreach ($identification->getScores() as $scoreName => $scoreValue) {
+                echo '<li>' . $scoreName . ': ' . $scoreValue . '</li>';
+            }
+            echo '</ul>';
+            
+            echo '<ul style="float: left;">';
+            foreach ($identification->getPeptide()->getModifications() as $modification) {
+                echo '<li>@' . $modification->getLocation() . ' ' . $modification->getName() . ' (' . $modification->getMonoisotopicMass() . ')</li>';
+            }
+            echo '</ul>';
         }
         
-        echo '</tr>';
+        echo '<hr style="clear: both;" />';
     }
-    ?>   
-    </tbody>
-</table>
+    
+    ?>
 
-<hr />
+<a name="proteins" />
+<h2>Protein Groups</h2>
+
+<p>Each table shows the protein accession and the associated peptide
+    evidence within the group.</p>
 <?php
+    $proteinGroups = $reader->getProteinDetectionList();
+    if (! is_null($proteinGroups)) {
+        foreach ($proteinGroups as $id => $group) {
+            echo '<h3>' . $id . '</h3>';
+            foreach ($group as $id => $hypothesis) {
+                echo '<table class="formattedTable">';
+                echo '<tr>';
+                echo '<th rowspan="' . (count($hypothesis['peptides']) + 1) . '">';
+                echo $hypothesis['protein']->getAccession() . '</th>';
+                echo '<td>' . $hypothesis['protein']->getDescription() . '</th></tr>';
+                
+                foreach ($hypothesis['peptides'] as $peptide) {
+                    echo '<td>' . $peptide->getSequence() . '</td>';
+                    echo '</tr>';
+                }
+                echo '</table><hr />';
+            }
+        }
+    }
+    else
+    {
+        echo '<p>No protein group data present.</p>';
+    }
 }

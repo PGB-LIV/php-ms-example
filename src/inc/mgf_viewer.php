@@ -5,8 +5,14 @@ use pgb_liv\php_ms\Reader\MgfReader;
 <h2>MGF Viewer</h2>
 <form enctype="multipart/form-data" action="?page=mgf_viewer"
     method="POST">
-    MGF File: <input name="mgf" type="file" /><br /> <input
-        type="submit" value="Send File" /><br />
+    <fieldset>
+        <label for="mgf">MGF File</label> <input name="mgf" id="mgf"
+            type="file" />
+    </fieldset>
+
+    <fieldset>
+        <input type="submit" value="Upload" />
+    </fieldset>
 </form>
 <?php
 if (isset($_FILES['mgf'])) {

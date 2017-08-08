@@ -5,8 +5,14 @@ use pgb_liv\php_ms\Reader\FastaReader;
 <h2>FASTA Viewer</h2>
 <form enctype="multipart/form-data" action="?page=fasta_viewer"
     method="POST">
-    FASTA File: <input name="fasta" type="file" /><br /> <input
-        type="submit" value="Send File" /><br />
+    <fieldset>
+        <label for="fasta">FASTA File</label> <input name="fasta" id="fasta"
+            type="file" />
+    </fieldset>
+
+    <fieldset>
+        <input type="submit" value="Upload" />
+    </fieldset>
 </form>
 <?php
 if (isset($_FILES['fasta'])) {
@@ -26,7 +32,7 @@ if (isset($_FILES['fasta'])) {
     
     foreach ($organisms as $name => $proteins) {
         echo '<h2>' . $name . '</h2>';
-        echo '<table><thead><tr><th>Accession</th><th>Entry Name</th><th>Description</th><th>Gene</th><th>Sequence Version</th></tr></thead><tbody>';
+        echo '<table class="formattedTable"><thead><tr><th>Accession</th><th>Entry Name</th><th>Description</th><th>Gene</th><th>Sequence Version</th></tr></thead><tbody>';
         foreach ($proteins as $protein) {
             echo '<tr><td>';
             echo $protein->getAccession();

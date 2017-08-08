@@ -44,7 +44,7 @@ if (! empty($_FILES)) {
     </fieldset>
     <fieldset>
         <label for="prefix">Decoy Prefix</label> 
-        <input type="text" value="DECOY_" id="prefix" />
+        <input type="text" value="DECOY_" name="prefix" id="prefix" />
     </fieldset>
     <fieldset>
         <input type="submit" value="Generate Decoys" />

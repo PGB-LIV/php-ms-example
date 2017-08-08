@@ -32,14 +32,24 @@ if (isset($_POST['massB'])) {
 <h2>Tolerance Calculator</h2>
 <h3>Convert Tolerance</h3>
 <form method="post" action="?page=tolerance_calc">
-    Mass: <input type="text" name='mass' value="<?php echo $mass; ?>" />Da<br />
-    Tolerance Value: <input type="text" name='tolVal'
-        value="<?php echo $toleranceValue; ?>" /> <select name="tolUnit">
-        <option
-            <?php echo $toleranceUnit == 'ppm' ? 'selected="selected"' : ''; ?>>ppm</option>
-        <option
-            <?php echo $toleranceUnit == 'Da' ? 'selected="selected"' : ''; ?>>Da</option>
-    </select><br /> <input type="submit" />
+    <fieldset>
+        <label for="mass"> Mass</label> <input type="text" name="mass"
+            id="mass" value="<?php echo $mass; ?>" />Da<br />
+    </fieldset>
+    <fieldset>
+        <label for="tolVal"> Tolerance Value</label> 
+        <input type="text"
+            name='tolVal' value="<?php echo $toleranceValue; ?>" id="tolVal" /> <select
+            name="tolUnit">
+            <option
+                <?php echo $toleranceUnit == 'ppm' ? 'selected="selected"' : ''; ?>>ppm</option>
+            <option
+                <?php echo $toleranceUnit == 'Da' ? 'selected="selected"' : ''; ?>>Da</option>
+        </select>
+    </fieldset>
+    <fieldset>
+        <input type="submit" value="Convert" />
+    </fieldset>
 </form>
 
 <p class="centreText">
@@ -57,17 +67,22 @@ if ($toleranceUnit == Tolerance::PPM) {
 <h3>Calculate Difference</h3>
 
 <form method="post" action="?page=tolerance_calc">
-    Mass A: <input type="text" name='massA'
-        value="<?php echo $massA; ?>" />Da<br /> Mass B: <input
-        type="text" name='massB' value="<?php echo $massB; ?>" />Da<br />
-    <input type="submit" />
+<fieldset><label for="massA">
+    Mass A</label> <input type="text" name='massA'
+        value="<?php echo $massA; ?>" />Da</fieldset> 
+        <fieldset><label for="massB">Mass B</label> <input
+        type="text" name='massB' value="<?php echo $massB; ?>" />Da
+        </fieldset>
+        <fieldset>
+    <input type="submit" value="Convert" />
+    </fieldset>
 </form>
 
 <p class="centreText">
 <?php
 $tolerance = new Tolerance(abs($massA - $massB), Tolerance::DA);
 
-echo 'The mass difference of <strong>'.$massA . 'Da</strong> and <strong>' . $massB . 'Da</strong><br />';
-echo 'In Daltons, <strong>'.round($tolerance->getDaltonDelta($massB), 5) . ' Da</strong><br />';
+echo 'The mass difference of <strong>' . $massA . 'Da</strong> and <strong>' . $massB . 'Da</strong><br />';
+echo 'In Daltons, <strong>' . round($tolerance->getDaltonDelta($massB), 5) . ' Da</strong><br />';
 echo 'In ppm, <strong>'.round($tolerance->getPpmDelta($massB), 5) . ' ppm</strong>';
 ?></p>
