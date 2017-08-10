@@ -27,13 +27,12 @@
 	<property name="phpdox" value="${basedir}/src/vendor/bin/phpdox" />
 	<property name="phploc" value="${basedir}/src/vendor/bin/phploc" />
 	<property name="phpmd" value="${basedir}/src/vendor/bin/phpmd" />
-	<property name="phpunit" value="${basedir}/src/vendor/bin/phpunit" />
 
-	<target name="full-build" depends="prepare,static-analysis,phpdox,-check-failure" description="Performs static analysis, runs the tests, and generates project documentation" />
+	<target name="full-build" depends="prepare,static-analysis,phpdox" description="Performs static analysis, runs the tests, and generates project documentation" />
 
-	<target name="full-build-parallel" depends="prepare,static-analysis-parallel,phpdox,-check-failure" description="Performs static analysis (executing the tools in parallel), runs the tests, and generates project documentation" />
+	<target name="full-build-parallel" depends="prepare,static-analysis-parallel,phpdox" description="Performs static analysis (executing the tools in parallel), runs the tests, and generates project documentation" />
 
-	<target name="quick-build" depends="prepare,lint,phpunit-no-coverage" description="Performs a lint check and runs the tests (without generating code coverage reports)" />
+	<target name="quick-build" depends="prepare,lint" description="Performs a lint check and runs the tests (without generating code coverage reports)" />
 
 	<target name="static-analysis" depends="lint,phploc-ci,pdepend,phpmd-ci,phpcs-ci,phpcpd-ci" description="Performs static analysis" />
 
@@ -197,31 +196,7 @@
 
 		<property name="phpcpd.done" value="true" />
 	</target>
-
-	<target name="phpunit" unless="phpunit.done" depends="prepare" description="Run unit tests with PHPUnit">
-		<echo>Loading config file: ${PHPUNIT_MASCOT_PATH}</echo>
-		
-		<exec executable="${phpunit}" resultproperty="result.phpunit" taskname="phpunit" dir="${basedir}">
-			<arg value="--configuration" />
-			<arg path="${basedir}/build/phpunit.xml" />
-			<arg value="--coverage-xml" />
-			<arg path="${basedir}/build/logs/coverage/xml" />
-			<env key="PHPUNIT_MASCOT_PATH" file="${PHPUNIT_MASCOT_PATH}" />
-		</exec>
-
-		<property name="phpunit.done" value="true" />
-	</target>
-
-	<target name="phpunit-no-coverage" unless="phpunit.done" depends="prepare" description="Run unit tests with PHPUnit (without generating code coverage reports)">
-		<exec executable="${phpunit}" failonerror="true" taskname="phpunit" dir="${basedir}">
-			<arg value="--configuration" />
-			<arg path="${basedir}/build/phpunit.xml" />
-			<arg value="--no-coverage" />
-		</exec>
-
-		<property name="phpunit.done" value="true" />
-	</target>
-
+	
 	<target name="phpdox" unless="phpdox.done" depends="phploc-ci,phpcs-ci,phpmd-ci" description="Generate project documentation using phpDox">
 		<exec executable="${phpdox}" taskname="phpdox">
 			<arg value="-f" />
@@ -229,15 +204,5 @@
 		</exec>
 
 		<property name="phpdox.done" value="true" />
-	</target>
-
-	<target name="-check-failure">
-		<fail message="PHPUnit did not finish successfully">
-			<condition>
-				<not>
-					<equals arg1="${result.phpunit}" arg2="0" />
-				</not>
-			</condition>
-		</fail>
 	</target>
 </project>
