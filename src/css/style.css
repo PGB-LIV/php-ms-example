@@ -29,41 +29,6 @@ progress {
     vertical-align: baseline
 }
 
-audio
-
-
-:not
-
- 
-
-(
-[
-controls
-]
-
- 
-
-){
-display
-
-
-:
-
- 
-
-none
-
-
-;
-height
-
-
-:
-
- 
-
-0
-}
 [hidden], template {
     display: none
 }
@@ -117,33 +82,6 @@ figure {
 
 img {
     border-style: none
-}
-
-svg
-
-
-:not
-
- 
-
-(
-:root
-
- 
-
-){
-overflow
-
-
-:
-
- 
-
-hidden
-
-
-
-
 }
 code, kbd, pre, samp {
     font-family: monospace, monospace;
