@@ -67,7 +67,7 @@ if (isset($_FILES['fasta'])) {
     </fieldset>
 
     <fieldset>
-        <label for="nme">NME</label><input type="checkbox" name="nme"
+        <label for="nme"><abbr title=" N-terminal Methionine Excision">NME</abbr></label><input type="checkbox" name="nme"
             id="nme" value="1" />
     </fieldset>
 
