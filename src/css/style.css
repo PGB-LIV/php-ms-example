@@ -148,30 +148,6 @@ textarea {
     padding: 0;
 }
 
-[type=number]::-webkit-inner-spin-button, [type=number]::-webkit-outer-spin-button
-    {
-    height: auto;
-}
-
-[type=search] {
-    -webkit-appearance: textfield;
-    outline-offset: -2px;
-}
-
-[type=search]::-webkit-search-cancel-button, [type=search]::-webkit-search-decoration
-    {
-    -webkit-appearance: none;
-}
-
-::-webkit-input-placeholder {
-    color: inherit;
-    opacity: 0.54;
-}
-
-::-webkit-file-upload-button {
-    -webkit-appearance: button;
-    font: inherit;
-}
 /* End extract */
 html, body {
     font-family: Verdana, sans-serif;
@@ -228,9 +204,9 @@ a {
 }
 
 footer {
-    padding: 0.01em 16px;
+    padding: .01em 16px;
     color: #fff !important;
-    background-color: #57A639 !important;
+    background-color: #57a639 !important;
     text-align: center !important;
     margin-top: 16px !important;
 }
@@ -258,7 +234,7 @@ body {
     background-color: #fff !important;
     color: #757575 !important;
     box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.2), 0 4px 20px 0
-        rgba(0, 0, 0, 0.19);
+        rgba(0, 0, 0, .19);
     padding: 1em .5em 2em 4em;
     display: block;
     float: left;
@@ -279,8 +255,8 @@ body {
 
 .panel {
     padding: .2em 1em 5em 1em;
-    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0
-        rgba(0, 0, 0, 0.12);
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, .16), 0 2px 10px 0
+        rgba(0, 0, 0, .12);
     color: #000 !important;
     background-color: #fff !important;
     margin-bottom: 16px !important;
@@ -360,9 +336,9 @@ h2 {
 }
 
 form {
-    width: 80%; margin-left : auto;
-    margin-right: auto;
+    width: 80%; 
     margin-left: auto;
+    margin-right: auto;
 }
 
 form label {
@@ -378,7 +354,7 @@ form input, form select {
     margin: 0;
     padding: 4px;
     width: 200px;
-    color: #57A639;
+    color: #57a639;
 }
 
 form input[type="text"] {
