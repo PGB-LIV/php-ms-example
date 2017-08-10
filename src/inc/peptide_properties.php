@@ -95,7 +95,7 @@ foreach ($sequences as $sequence) {
     echo '<h3>' . $peptide->getSequence() . '</h3>';
     echo 'Length: ' . $peptide->getLength() . '<br />';
     echo 'Mass: ' . $peptide->getMass() . 'Da<br />';
-    echo 'Formula: ' . $peptide->getMolecularFormula() . '<br /><br />';
+    echo 'Formula: ' . preg_replace('/([0-9]+)/', '<sub>$1</sub>', $peptide->getMolecularFormula()) . '<br /><br />';
     
     $frags = array();
     $frags['B Ions'] = new BFragment($peptide);
@@ -135,10 +135,10 @@ foreach ($sequences as $sequence) {
             $ionIndex = $i;
             if ($fragger->isReversed())
             {
-                $ionIndex = $peptide->getLength() - $i;
+                $ionIndex = $peptide->getLength() -($i - 1);
             }
                 
-            $ion = '&nbsp;';
+            $ion = '∅';
             if (isset($ions[$ionIndex])) {
                 $ion = $ions[$ionIndex];
                 

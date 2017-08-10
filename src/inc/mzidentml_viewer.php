@@ -151,23 +151,27 @@ if (! empty($_FILES)) {
     foreach ($reader->getAnalysisData() as $spectra) {
         echo '<h3>' . $spectra->getTitle() . '</h3>';
         
-        echo '<ul style="float: right;">';
-        echo '<li>m/z: ' . number_format($spectra->getMassCharge(), 4) . 'Da</li>';
-        echo '<li>Mass: ' . number_format($spectra->getMass(), 4) . 'Da</li>';
-        echo '<li>Charge: ' . $spectra->getCharge() . '</li>';
-        echo '</ul>';
+        echo '<dl style="float: right;">';
+        echo '<dt>m/z</dt>';
+        echo '<dd>' . number_format($spectra->getMassCharge(), 4) . 'Da</dd>';
+        echo '<dt>Mass</dt>';
+        echo '<dd>' . number_format($spectra->getMass(), 4) . 'Da</dd>';
+        echo '<dt>Charge</dt>';
+        echo '<dd>' . $spectra->getCharge() . '</dd>';
+        echo '</dl>';
         
         foreach ($spectra->getIdentifications() as $identification) {
             echo '<h4 style="margin-left: 1em;">' . $identification->getPeptide()->getSequence() . ' <em>(' . $identification->getPeptide()
                 ->getProtein()
                 ->getAccession() . ')</em></h4>';
             
-            echo '<ul style="float: left; margin-left: 1em;">';
+            echo '<dl style="float: left; margin-left: 1em;">';
             
             foreach ($identification->getScores() as $scoreName => $scoreValue) {
-                echo '<li>' . $scoreName . ': ' . $scoreValue . '</li>';
+                echo '<dt>' . $reader->getCvParamName($scoreName) . '</dt>';
+                echo '<dd>' . $scoreValue . '</dd>';
             }
-            echo '</ul>';
+            echo '</dl>';
             
             echo '<ul style="float: left;">';
             foreach ($identification->getPeptide()->getModifications() as $modification) {
@@ -192,22 +196,26 @@ if (! empty($_FILES)) {
         foreach ($proteinGroups as $id => $group) {
             echo '<h3>' . $id . '</h3>';
             foreach ($group as $id => $hypothesis) {
-                echo '<table class="formattedTable">';
-                echo '<tr>';
-                echo '<th rowspan="' . (count($hypothesis['peptides']) + 1) . '">';
-                echo $hypothesis['protein']->getAccession() . '</th>';
-                echo '<td>' . $hypothesis['protein']->getDescription() . '</th></tr>';
+                echo '<h4>' . $hypothesis['protein']->getAccession() . '</h4>';
+                echo '<p>' . $hypothesis['protein']->getDescription() . '</p>';
                 
-                foreach ($hypothesis['peptides'] as $peptide) {
-                    echo '<td>' . $peptide->getSequence() . '</td>';
-                    echo '</tr>';
+                echo '<dl style="float: left; margin-left: 1em;">';
+                foreach ($hypothesis['cvParam'] as $cvParam) {
+                    echo '<dt>' . $reader->getCvParamName($cvParam['accession']) . '</dt>';
+                    echo '<dd>' . (isset($cvParam['value']) ? $cvParam['value'] : '&nbsp') . '</dd>';
                 }
-                echo '</table><hr />';
+                echo '</dl>';
+                
+                echo '<ul style="float: left; margin-left: 1em;">';
+                foreach ($hypothesis['peptides'] as $peptide) {
+                    echo '<li>' . $peptide->getSequence() . '</li>';
+                }
+                echo '</ul>';
+                
+                echo '<hr style="clear: both;" />';
             }
         }
-    }
-    else
-    {
+    } else {
         echo '<p>No protein group data present.</p>';
     }
 }

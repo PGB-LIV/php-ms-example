@@ -422,61 +422,6 @@ h2 {
     padding-left: 16px
 }
 
-.w3-btn, .w3-button {
-    border: none;
-    display: inline-block;
-    outline: 0;
-    padding: 8px 16px;
-    vertical-align: middle;
-    overflow: hidden;
-    text-decoration: none;
-    color: inherit;
-    background-color: inherit;
-    text-align: center;
-    cursor: pointer;
-    white-space: nowrap
-}
-
-.w3-btn:hover {
-    box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0
-        rgba(0, 0, 0, 0.19)
-}
-
-.w3-btn, .w3-button {
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none
-}
-
-.w3-disabled, .w3-btn:disabled, .w3-button:disabled {
-    cursor: not-allowed;
-    opacity: 0.3
-}
-
-.w3-disabled *, :disabled * {
-    pointer-events: none
-}
-
-.w3-btn.w3-disabled:hover, .w3-btn:disabled:hover {
-    box-shadow: none
-}
-
-.w3-badge, .w3-tag {
-    background-color: #000;
-    color: #fff;
-    display: inline-block;
-    padding-left: 8px;
-    padding-right: 8px;
-    text-align: center
-}
-
-.w3-badge {
-    border-radius: 50%
-}
-
 form {
     width: 80%; margin-left : auto;
     margin-right: auto;
@@ -493,14 +438,20 @@ form label:after {
 }
 
 form input, form select {
+    margin: 0;
     padding: 4px;
-    margin: 4px;
-    width: 40%;
-    display:block;
+    width: 200px;
+    color: #57A639;
 }
 
 form input[type="text"] {
     border: 1px solid #ccc;
+}
+
+input[type='checkbox'] {
+	width: 25px;
+	margin: 10px 100px;
+	position: relative;
 }
 
 form input[type="submit"] {
@@ -514,42 +465,10 @@ form input:after, form select:after {
     clear: both;
 }
 
-.w3-dropdown-click, .w3-dropdown-hover {
-    position: relative;
-    display: inline-block;
-    cursor: pointer
+form fieldset {
+    border: 0;
 }
 
-.w3-dropdown-hover:hover .w3-dropdown-content {
-    display: block;
-    z-index: 1
-}
-
-.w3-dropdown-hover:first-child, .w3-dropdown-click:hover {
-    background-color: #ccc;
-    color: #000
-}
-
-.w3-dropdown-hover:hover>.w3-button:first-child, .w3-dropdown-click:hover>.w3-button:first-child
-    {
-    background-color: #ccc;
-    color: #000
-}
-
-.w3-dropdown-content {
-    cursor: auto;
-    color: #000;
-    background-color: #fff;
-    display: none;
-    position: absolute;
-    min-width: 160px;
-    margin: 0;
-    padding: 0
-}
-
-.w3-check, .w3-radio {
-    width: 24px;
-    height: 24px;
-    position: relative;
-    top: 6px
+input.smallInput {
+    width: 50px;
 }
