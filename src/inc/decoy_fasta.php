@@ -2,14 +2,16 @@
 use pgb_liv\php_ms\Reader\FastaReader;
 use pgb_liv\php_ms\Writer\FastaWriter;
 
+define('FORM_FILE', 'fasta');
+
 if (! empty($_FILES)) {
-    if ($_FILES['fasta']['error'] != 0) {
-        die('Upload Error: ' . $_FILES['fasta']['error']);
+    if ($_FILES[FORM_FILE]['error'] != 0) {
+        die('Upload Error: ' . $_FILES[FORM_FILE]['error']);
     }
     
     $decoyPrefix = $_POST['prefix'];
     
-    $fastaFile = $_FILES['fasta']['tmp_name'];
+    $fastaFile = $_FILES[FORM_FILE]['tmp_name'];
     $reader = new FastaReader($fastaFile);
     
     header('Content-type: text/plain;');
@@ -39,7 +41,7 @@ if (! empty($_FILES)) {
 <form enctype="multipart/form-data"
     action="?page=decoy_fasta&amp;txtonly=1" method="POST">
     <fieldset>
-        <label for="file">FASTA File</label> <input name="fasta"
+        <label for="file">FASTA File</label> <input name="<?php echo FORM_FILE; ?>"
             type="file" id="file" />
     </fieldset>
     <fieldset>

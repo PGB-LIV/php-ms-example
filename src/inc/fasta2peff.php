@@ -4,6 +4,8 @@ use pgb_liv\php_ms\Core\Modification;
 use pgb_liv\php_ms\Writer\FastaWriter;
 use pgb_liv\php_ms\Core\Database\Fasta\PeffFastaEntry;
 
+define('FORM_FILE', 'fasta');
+
 function getModData(Modification $mod, $obo)
 {
     $idFound = false;
@@ -49,13 +51,13 @@ function getModData(Modification $mod, $obo)
     }
 }
 if (! empty($_FILES)) {
-    if ($_FILES['fasta']['error'] != 0) {
-        die('Upload Error: ' . $_FILES['fasta']['error']);
+    if ($_FILES[FORM_FILE]['error'] != 0) {
+        die('Upload Error: ' . $_FILES[FORM_FILE]['error']);
     }
     
     header('Content-type: text/plain;');
     
-    $fastaFile = $_FILES['fasta']['tmp_name'];
+    $fastaFile = $_FILES[FORM_FILE]['tmp_name'];
     $reader = new FastaReader($fastaFile);
     $writer = new FastaWriter('php://output', new PeffFastaEntry());
     
@@ -74,7 +76,7 @@ if (! empty($_FILES)) {
     <form enctype="multipart/form-data" action="?page=fasta2peff&amp;txtonly=1"
         method="POST">
     <fieldset>
-        <label for="fasta">FASTA File</label> <input name="fasta" id="fasta"
+        <label for="fasta">FASTA File</label> <input name="<?php echo FORM_FILE; ?>" id="fasta"
             type="file" />
     </fieldset>
 

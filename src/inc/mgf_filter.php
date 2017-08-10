@@ -9,7 +9,9 @@ error_reporting(E_ALL);
 ini_set('display_errors', true);
 set_time_limit(3600);
 
-if (isset($_FILES['fasta'])) {
+define('FORM_FILE', 'mgf');
+
+if (isset($_FILES[FORM_FILE])) {
     $filters = array();
     
     if ($_POST['charge_min'] != 'ANY' || $_POST['charge_max'] != 'ANY') {
@@ -33,13 +35,13 @@ if (isset($_FILES['fasta'])) {
         $filters[] = new FilterMass($min, $max);
     }
     
-    $mgfFile = $_FILES['fasta']['tmp_name'];
+    $mgfFile = $_FILES[FORM_FILE]['tmp_name'];
     
     $reader = new MgfReader($mgfFile);
     $writer = new MgfWriter('php://output');
     
     header('Content-type: text/plain;');
-    header('Content-Disposition: attachment; filename="' . $_FILES['fasta']['name'] . '"');
+    header('Content-Disposition: attachment; filename="' . $_FILES[FORM_FILE]['name'] . '"');
     
     foreach ($reader as $spectra) {
         $skip = false;
@@ -68,7 +70,7 @@ if (isset($_FILES['fasta'])) {
     action="?page=mgf_filter&amp;txtonly=1" method="POST">
 
     <fieldset>
-        <label for="file">MGF File</label><input name="fasta"
+        <label for="file">MGF File</label><input name="<?php echo FORM_FILE;?>" id="file" 
             type="file" />
     </fieldset>
     <fieldset>

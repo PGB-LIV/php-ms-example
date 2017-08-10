@@ -4,11 +4,13 @@ use pgb_liv\php_ms\Reader\FastaReader;
 use pgb_liv\php_ms\Core\Tolerance;
 use pgb_liv\php_ms\Utility\Filter\FilterMass;
 
-if (isset($_FILES['fasta'])) {
+define('FORM_FILE', 'fasta');
+
+if (isset($_FILES[FORM_FILE])) {
     header('Content-type: text/plain;');
-    header('Content-Disposition: attachment; filename="' . $_FILES['fasta']['name'] . '.csv"');
+    header('Content-Disposition: attachment; filename="' . $_FILES[FORM_FILE]['name'] . '.csv"');
     
-    $fastaFile = $_FILES['fasta']['tmp_name'];
+    $fastaFile = $_FILES[FORM_FILE]['tmp_name'];
     
     $reader = new FastaReader($fastaFile);
     $digest = DigestFactory::getDigest($_POST['enzyme']);
@@ -51,7 +53,7 @@ if (isset($_FILES['fasta'])) {
     method="POST">
 
     <fieldset>
-        <label for="fasta">FASTA File</label> <input name="fasta"
+        <label for="fasta">FASTA File</label> <input name="<?php echo FORM_FILE; ?>"
             type="file" id="fasta" />
     </fieldset>
 

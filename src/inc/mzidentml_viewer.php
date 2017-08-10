@@ -3,13 +3,15 @@ use pgb_liv\php_ms\Reader\MzIdentMlReaderFactory;
 use pgb_liv\php_ms\Reader\MzIdentMlReader1r1;
 
 set_time_limit(600);
+
+define('FORM_FILE', 'mzidentml');
 ?>
 <h2>MzIdentML Viewer</h2>
 
 <form enctype="multipart/form-data" action="?page=mzidentml_viewer"
     method="POST">
     <fieldset>
-        <label for="file">MzIdentML File</label> <input name="mzidentml"
+        <label for="file">MzIdentML File</label> <input name="<?php echo FORM_FILE; ?>"
             type="file" id="file" /> (.gz or .mzid supported)
     </fieldset>
 
@@ -20,14 +22,15 @@ set_time_limit(600);
 <?php
 
 if (! empty($_FILES)) {
-    $mzIdentMlFile = $_FILES['mzidentml']['tmp_name'];
+    $mzIdentMlFile = $_FILES[FORM_FILE]['tmp_name'];
     
-    if (substr_compare($_FILES['mzidentml']['name'], '.gz', strlen($_FILES['mzidentml']['name']) - 3, strlen($_FILES['mzidentml']['name'])) === 0) {
+    if (substr_compare($_FILES[FORM_FILE]['name'], '.gz', strlen($_FILES[FORM_FILE]['name']) - 3, strlen($_FILES[FORM_FILE]['name'])) === 0) {
         // This input should be from somewhere else, hard-coded in this example
-        $file_name = $_FILES['mzidentml']['tmp_name'];
+        $file_name = $_FILES[FORM_FILE]['tmp_name'];
         
         // Raising this value may increase performance
-        $buffer_size = 4096; // read 4kb at a time
+        // read 4kb at a time
+        $buffer_size = 4096;
         $out_file_name = $file_name . '_decom';
         
         // Open our files (in binary mode)
@@ -47,7 +50,7 @@ if (! empty($_FILES)) {
         
         $mzIdentMlFile = $out_file_name;
     }
-    echo '<h1>' . $_FILES['mzidentml']['name'] . '</h1>';
+    echo '<h1>' . $_FILES[FORM_FILE]['name'] . '</h1>';
     
     $reader = MzIdentMlReaderFactory::getReader($mzIdentMlFile);
     ?>
