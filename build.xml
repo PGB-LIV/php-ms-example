@@ -83,11 +83,6 @@
 				<include name="**/*.php" />
 				<modified />
 			</fileset>
-
-			<fileset dir="${basedir}/tests">
-				<include name="**/*.php" />
-				<modified />
-			</fileset>
 		</apply>
 
 		<property name="lint.done" value="true" />
