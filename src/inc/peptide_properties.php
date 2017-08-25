@@ -35,6 +35,11 @@ for ($i = 0; $i < count($modificationPositions); $i ++) {
     $mass = (float) $modificationMasses[$i];
     $location = $modificationPositions[$i];
     
+    if (strlen($location) == 0)
+    {
+        continue;
+    }
+    
     $modification = new Modification();
     $modification->setMonoisotopicMass($mass);
     if (is_numeric($location)) {
