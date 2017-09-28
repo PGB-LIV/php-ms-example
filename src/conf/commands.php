@@ -8,3 +8,4 @@ $_COMMANDS['mzidentml_viewer'] = 'MzIdentML Viewer';
 $_COMMANDS['mgf_viewer'] = 'MGF Viewer';
 $_COMMANDS['fasta_viewer'] = 'FASTA Viewer';
 $_COMMANDS['tolerance_calc'] = 'Tolerance Calculator';
+$_COMMANDS['msgfplus'] = 'MS-GF+ Search';

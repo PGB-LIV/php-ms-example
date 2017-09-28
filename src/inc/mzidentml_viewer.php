@@ -1,18 +1,20 @@
 <?php
 use pgb_liv\php_ms\Reader\MzIdentMlReaderFactory;
 use pgb_liv\php_ms\Reader\MzIdentMlReader1r1;
+use pgb_liv\php_ms\Core\Modification;
 
 set_time_limit(600);
 
 define('FORM_FILE', 'mzidentml');
 ?>
-<h2>MzIdentML Viewer</h2>
+<h2>mzIdentML Viewer</h2>
 
 <form enctype="multipart/form-data" action="?page=mzidentml_viewer"
     method="POST">
     <fieldset>
-        <label for="file">MzIdentML File</label> <input name="<?php echo FORM_FILE; ?>"
-            type="file" id="file" /> (.gz or .mzid supported)
+        <label for="file">mzIdentML File</label> <input
+            name="<?php echo FORM_FILE; ?>" type="file" id="file" />
+        (.gz or .mzid supported)
     </fieldset>
 
     <fieldset>
@@ -21,36 +23,44 @@ define('FORM_FILE', 'mzidentml');
 </form>
 <?php
 
-if (! empty($_FILES)) {
-    $mzIdentMlFile = $_FILES[FORM_FILE]['tmp_name'];
-    
-    if (substr_compare($_FILES[FORM_FILE]['name'], '.gz', strlen($_FILES[FORM_FILE]['name']) - 3, strlen($_FILES[FORM_FILE]['name'])) === 0) {
-        // This input should be from somewhere else, hard-coded in this example
-        $file_name = $_FILES[FORM_FILE]['tmp_name'];
+if (! empty($_FILES) || isset($_GET['search'])) {
+    if (! empty($_FILES)) {
+        $name = $_FILES[FORM_FILE]['name'];
+        $mzIdentMlFile = $_FILES[FORM_FILE]['tmp_name'];
         
-        // Raising this value may increase performance
-        // read 4kb at a time
-        $buffer_size = 4096;
-        $out_file_name = $file_name . '_decom';
-        
-        // Open our files (in binary mode)
-        $file = gzopen($file_name, 'rb');
-        $out_file = fopen($out_file_name, 'wb');
-        
-        // Keep repeating until the end of the input file
-        while (! gzeof($file)) {
-            // Read buffer-size bytes
-            // Both fwrite and gzread and binary-safe
-            fwrite($out_file, gzread($file, $buffer_size));
+        if (substr_compare($_FILES[FORM_FILE]['name'], '.gz', strlen($_FILES[FORM_FILE]['name']) - 3, 
+            strlen($_FILES[FORM_FILE]['name'])) === 0) {
+            // This input should be from somewhere else, hard-coded in this example
+            $file_name = $_FILES[FORM_FILE]['tmp_name'];
+            
+            // Raising this value may increase performance
+            // read 4kb at a time
+            $buffer_size = 4096;
+            $out_file_name = $file_name . '_decom';
+            
+            // Open our files (in binary mode)
+            $file = gzopen($file_name, 'rb');
+            $out_file = fopen($out_file_name, 'wb');
+            
+            // Keep repeating until the end of the input file
+            while (! gzeof($file)) {
+                // Read buffer-size bytes
+                // Both fwrite and gzread and binary-safe
+                fwrite($out_file, gzread($file, $buffer_size));
+            }
+            
+            // Files are done, close files
+            fclose($out_file);
+            gzclose($file);
+            
+            $mzIdentMlFile = $out_file_name;
         }
-        
-        // Files are done, close files
-        fclose($out_file);
-        gzclose($file);
-        
-        $mzIdentMlFile = $out_file_name;
+    } else {
+        $mzIdentMlFile = sys_get_temp_dir() . '/' . $_GET['search'] . '.mzid';
+        $name = $_GET['name'];
     }
-    echo '<h1>' . $_FILES[FORM_FILE]['name'] . '</h1>';
+    
+    echo '<h1>' . $name . '</h1>';
     
     $reader = MzIdentMlReaderFactory::getReader($mzIdentMlFile);
     ?>
@@ -126,7 +136,14 @@ if (! empty($_FILES)) {
                 echo '<h4>Modifications</h4>';
                 
                 foreach ($protocol['modifications'] as $modification) {
-                    echo '[' . ($modification->isFixed() ? 'F' : 'V') . '] ' . $modification->getName() . ' ' . $modification->getMonoisotopicMass() . ' ' . implode('', $modification->getResidues()) . '<br />';
+                    echo '[' . ($modification->isFixed() ? 'F' : 'V') . '] ' . $modification->getName() . ' (' .
+                         implode(',', $modification->getResidues());
+                    
+                    if ($modification->getPosition() != Modification::POSITION_ANY) {
+                        echo '@' . $modification->getPosition();
+                    }
+                    
+                    echo ') ' . $modification->getMonoisotopicMass() . ' ' . '<br />';
                 }
             }
         }
@@ -151,40 +168,58 @@ if (! empty($_FILES)) {
 <a name="peptides" />
 <h2>Peptide Spectrum Matches</h2>
 <?php
+    echo '<table style="font-size:0.8em;" class="formattedTable hoverableRow">';
+    
+    $headerShown = false;
+    
     foreach ($reader->getAnalysisData() as $spectra) {
-        echo '<h3>' . $spectra->getTitle() . '</h3>';
-        
-        echo '<dl style="float: right;">';
-        echo '<dt>m/z</dt>';
-        echo '<dd>' . number_format($spectra->getMassCharge(), 4) . 'Da</dd>';
-        echo '<dt>Mass</dt>';
-        echo '<dd>' . number_format($spectra->getMass(), 4) . 'Da</dd>';
-        echo '<dt>Charge</dt>';
-        echo '<dd>' . $spectra->getCharge() . '</dd>';
-        echo '</dl>';
-        
-        foreach ($spectra->getIdentifications() as $identification) {
-            echo '<h4 style="margin-left: 1em;">' . $identification->getPeptide()->getSequence() . ' <em>(' . $identification->getPeptide()
-                ->getProtein()
-                ->getAccession() . ')</em></h4>';
-            
-            echo '<dl style="float: left; margin-left: 1em;">';
-            
-            foreach ($identification->getScores() as $scoreName => $scoreValue) {
-                echo '<dt>' . $reader->getCvParamName($scoreName) . '</dt>';
-                echo '<dd>' . $scoreValue . '</dd>';
+        if (! $headerShown) {
+            $scoresHeader = '';
+            foreach ($spectra->getIdentifications() as $identification) {
+                foreach ($identification->getScores() as $scoreName => $scoreValue) {
+                    $scoresHeader .= '<th>' . $reader->getCvParamName($scoreName) . '</th>';
+                }
+                break;
             }
-            echo '</dl>';
             
-            echo '<ul style="float: left;">';
-            foreach ($identification->getPeptide()->getModifications() as $modification) {
-                echo '<li>@' . $modification->getLocation() . ' ' . $modification->getName() . ' (' . $modification->getMonoisotopicMass() . ')</li>';
-            }
-            echo '</ul>';
+            echo '<thead><tr><th>Scan</th><th>m/z</th><th>Charge</th>' . $scoresHeader .
+                 '<th>Mods</th></tr></thead><tbody>';
+            
+            $headerShown = true;
         }
         
-        echo '<hr style="clear: both;" />';
+        echo '<tr>';
+        echo '<td style="font-weight: bold;">' . $spectra->getTitle() . '</td>';
+        echo '<td>' . number_format($spectra->getMassCharge(), 4) . '</td>';
+        echo '<td>' . $spectra->getCharge() . '</td>';
+        echo '</tr>';
+        
+        foreach ($spectra->getIdentifications() as $identification) {
+            
+            echo '<tr>';
+            echo '<td colspan="3">' . $identification->getPeptide()->getSequence() . ' ';
+            echo '(' . $identification->getPeptide()
+                ->getProtein()
+                ->getAccession() . ')';
+            
+            foreach ($identification->getScores() as $scoreName => $scoreValue) {
+                // echo '<dt>' . $reader->getCvParamName($scoreName) . '</dt>';
+                echo '<td>' . $scoreValue . '</td>';
+            }
+            
+            echo '<td>';
+            $mods = array();
+            foreach ($identification->getPeptide()->getModifications() as $modification) {
+                $mods[$modification->getName()][] = $modification->getLocation();
+            }
+            foreach ($mods as $name => $positions) {
+                echo '[' . implode(',', $positions) . ']' . $name . ' ';
+            }
+            echo '</td>';
+            echo '</tr>';
+        }
     }
+    echo '</tbody></table>';
     
     ?>
 
