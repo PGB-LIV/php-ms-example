@@ -203,7 +203,6 @@ if (! empty($_FILES) || isset($_GET['search'])) {
                 ->getAccession() . ')';
             
             foreach ($identification->getScores() as $scoreName => $scoreValue) {
-                // echo '<dt>' . $reader->getCvParamName($scoreName) . '</dt>';
                 echo '<td>' . $scoreValue . '</td>';
             }
             
