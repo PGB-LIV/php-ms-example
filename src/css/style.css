@@ -10,6 +10,7 @@ html {
 html {
     -ms-text-size-adjust: 100%;
     -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
 }
 
 body {
@@ -36,6 +37,7 @@ progress {
 a {
     background-color: transparent;
     -webkit-text-decoration-skip: objects;
+    text-decoration-skip: objects;
 }
 
 a:active, a:hover {
@@ -110,10 +112,6 @@ button, input {
 
 button, select {
     text-transform: none;
-}
-
-button, html [type=button], [type=reset], [type=submit] {
-    -webkit-appearance: button;
 }
 
 fieldset {
@@ -195,10 +193,10 @@ a {
 
 footer {
     padding: .01em 16px;
-    color: #fff !important;
-    background-color: #57a639 !important;
-    text-align: center !important;
-    margin-top: 16px !important;
+    color: #fff;
+    background-color: #57a639;
+    text-align: center;
+    margin-top: 16px;
 }
 
 footer:before, footer:after {
@@ -208,20 +206,20 @@ footer:before, footer:after {
 }
 
 body {
-    color: #000 !important;
-    background-color: #f1f1f1 !important;
+    color: #000;
+    background-color: #f1f1f1;
 }
 
 #pagecontainer {
     max-width: 90%;
     margin: auto;
-    margin-top: 16px !important;
+    margin-top: 16px;
 }
 
 #navigation {
-    margin: 0;
-    background-color: #fff !important;
-    color: #757575 !important;
+    box-sizing: border-box; margin : 0;
+    background-color: #fff;
+    color: #757575;
     box-shadow: 0 4px 10px 0 rgba(0, 0, 0, .2), 0 4px 20px 0
         rgba(0, 0, 0, .19);
     padding: 1em .5em 2em 4em;
@@ -230,6 +228,7 @@ body {
     width: 24.99999%;
     max-width: 300px;
     list-style-type: none;
+    margin: 0;
 }
 
 #navigation>li {
@@ -246,15 +245,15 @@ body {
     padding: .2em 1em 5em 1em;
     box-shadow: 0 2px 5px 0 rgba(0, 0, 0, .16), 0 2px 10px 0
         rgba(0, 0, 0, .12);
-    color: #000 !important;
-    background-color: #fff !important;
-    margin-bottom: 16px !important;
+    color: #000;
+    background-color: #fff;
+    margin-bottom: 16px;
 }
 
 h2 {
-    color: #757575 !important;
-    padding-top: 16px !important;
-    padding-bottom: 16px !important;
+    color: #757575;
+    padding-top: 16px;
+    padding-bottom: 16px;
 }
 
 #grid:after, #grid:before {
@@ -341,6 +340,7 @@ form label:after {
 }
 
 form input, form select {
+    box-sizing: border-box;
     margin: 0;
     padding: 4px;
     width: 200px;
@@ -372,6 +372,6 @@ form fieldset {
     border: 0;
 }
 
-input.smallInput {
+.smallInput, .width50px {
     width: 50px;
 }
