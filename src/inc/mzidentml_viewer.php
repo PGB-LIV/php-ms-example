@@ -164,11 +164,10 @@ if (! empty($_FILES) || isset($_GET['search'])) {
         }
     }
     ?>
-
 <a name="peptides" />
 <h2>Peptide Spectrum Matches</h2>
 <?php
-    echo '<table style="font-size:0.8em;" class="formattedTable hoverableRow">';
+    echo '<table style="font-size:0.75em;" class="formattedTable hoverableRow">';
     
     $headerShown = false;
     
@@ -182,39 +181,38 @@ if (! empty($_FILES) || isset($_GET['search'])) {
                 break;
             }
             
-            echo '<thead><tr><th>Scan</th><th>m/z</th><th>Charge</th>' . $scoresHeader .
-                 '<th>Mods</th></tr></thead><tbody>';
+            echo '<thead><tr><th>Scan</th><th>m/z</th><th>z</th><th>Peptide</th><th>Protein</th><th>Mods</th>' . $scoresHeader .
+                 '</tr></thead><tbody>';
             
             $headerShown = true;
         }
         
-        echo '<tr>';
-        echo '<td style="font-weight: bold;">' . $spectra->getTitle() . '</td>';
-        echo '<td>' . number_format($spectra->getMassCharge(), 4) . '</td>';
-        echo '<td>' . $spectra->getCharge() . '</td>';
-        echo '</tr>';
-        
         foreach ($spectra->getIdentifications() as $identification) {
-            
             echo '<tr>';
-            echo '<td colspan="3">' . $identification->getPeptide()->getSequence() . ' ';
-            echo '(' . $identification->getPeptide()
-                ->getProtein()
-                ->getAccession() . ')';
+            echo '<td style="font-weight: bold;">' . wordwrap($spectra->getTitle(), 32, '<br />', true) . '</td>';
+            echo '<td>' . number_format($spectra->getMassCharge(), 2) . '</td>';
+            echo '<td>' . $spectra->getCharge() . '</td>';
             
-            foreach ($identification->getScores() as $scoreName => $scoreValue) {
-                echo '<td>' . $scoreValue . '</td>';
-            }
+            echo '<td>' . wordwrap($identification->getPeptide()->getSequence(), 16, '<br />', true) . '</td>';
+            echo '<td>' . $identification->getPeptide()
+                ->getProtein()
+                ->getAccession() . '</td>';
             
             echo '<td>';
             $mods = array();
             foreach ($identification->getPeptide()->getModifications() as $modification) {
                 $mods[$modification->getName()][] = $modification->getLocation();
             }
+            
             foreach ($mods as $name => $positions) {
                 echo '[' . implode(',', $positions) . ']' . $name . ' ';
             }
             echo '</td>';
+            
+            foreach ($identification->getScores() as $scoreName => $scoreValue) {
+                echo '<td>' . $scoreValue . '</td>';
+            }
+            
             echo '</tr>';
         }
     }

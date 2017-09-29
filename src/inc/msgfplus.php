@@ -13,16 +13,16 @@ define('MSGF_THREADS', 6);
 
 $files = scandir('conf/fasta');
 $fastaFiles = array();
+
 foreach ($files as $file) {
     $info = pathinfo($file);
-    if ($info['extension'] == 'fasta') {
+    if ($info['extension'] == 'fasta' && stripos($info['filename'], 'revcat') === false) {
         $fastaFiles[$file] = $info['filename'];
     }
 }
 
 if (isset($_FILES['mgf']) && $_FILES['mgf']['error'] == 0) {
-    if(filesize($_FILES['mgf']['tmp_name']) > 10485760)
-    {
+    if (filesize($_FILES['mgf']['tmp_name']) > 10485760) {
         echo 'MGF file too large';
         return;
     }
@@ -90,11 +90,16 @@ if (isset($_FILES['mgf']) && $_FILES['mgf']['error'] == 0) {
     
     $parameters->setOutputFile($outputFile);
     $parameters->setNumOfThreads(MSGF_THREADS);
+    
+    if ($_POST['decoy'] == 'Yes') {
+        $parameters->setDecoyEnabled(true);
+    }
+    
     $search = new MsgfPlusSearch(MSGF_JAR);
     try {
-        $search->search($parameters);
+        $idFile = $search->search($parameters);
         
-        $info = pathinfo($outputFile);
+        $info = pathinfo($idFile);
         
         header('Location: ?page=mzidentml_viewer&search=' . $info['filename'] . '&name=' . $_FILES['mgf']['name']);
     } catch (InvalidArgumentException $ex) {
@@ -149,9 +154,12 @@ if (empty($fastaFiles)) {
     </fieldset>
     <fieldset>
         <label for="fixed">Fixed Carbamidomethyl</label> <input
-            name="fixed" id="fixed" type="radio" value="Yes"
-            checked="checked" /><span>Yes</span><input name="fixed"
-            id="fixed" type="radio" value="No" />No
+            name="fixed" id="fixed" type="checkbox" value="Yes"
+            checked="checked" /><span>Yes</span>
+    </fieldset>
+    <fieldset>
+        <label for="decoy">Search Decoys</label> <input name="decoy"
+            id="decoy" type="checkbox" value="Yes" checked="checked" /><span>Yes</span>
     </fieldset>
     <fieldset>
         <label for="variable">Variable Modification</label> <select
