@@ -48,8 +48,8 @@ if (isset($_FILES['fasta'])) {
             echo wordwrap($protein->getSequence(), 80, '<br />', true);
             echo '</td></tr>';
         }
+        
+        echo '</tbody></table>';
     }
-    
-    echo '</tbody></table>';
 }
 ?>
