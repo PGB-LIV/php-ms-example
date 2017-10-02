@@ -6,8 +6,8 @@ use pgb_liv\php_ms\Reader\FastaReader;
 <form enctype="multipart/form-data" action="?page=fasta_viewer"
     method="POST">
     <fieldset>
-        <label for="fasta">FASTA File</label> <input name="fasta" id="fasta"
-            type="file" />
+        <label for="fasta">FASTA File</label> <input name="fasta"
+            id="fasta" type="file" />
     </fieldset>
 
     <fieldset>
@@ -16,7 +16,6 @@ use pgb_liv\php_ms\Reader\FastaReader;
 </form>
 <?php
 if (isset($_FILES['fasta'])) {
-    
     $fastaFile = $_FILES['fasta']['tmp_name'];
     
     $reader = new FastaReader($fastaFile);

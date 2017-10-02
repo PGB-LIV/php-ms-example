@@ -16,7 +16,6 @@ use pgb_liv\php_ms\Reader\MgfReader;
 </form>
 <?php
 if (isset($_FILES['mgf'])) {
-    
     $mgfFile = $_FILES['mgf']['tmp_name'];
     
     $reader = new MgfReader($mgfFile);

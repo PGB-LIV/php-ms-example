@@ -35,8 +35,7 @@ for ($i = 0; $i < count($modificationPositions); $i ++) {
     $mass = (float) $modificationMasses[$i];
     $location = $modificationPositions[$i];
     
-    if (strlen($location) == 0)
-    {
+    if (strlen($location) == 0) {
         continue;
     }
     
@@ -55,8 +54,11 @@ for ($i = 0; $i < count($modificationPositions); $i ++) {
 ?>
 <h2>MS Fragment Ion Generator</h2>
 
-<p>Generates the fragment ions for a specified peptide. You can generate for multiple peptides by seperating each peptide with a new line.</p>
-<p>Modifications can be input using either a location or a residue, and a mass. Each modification should be seperated by a new line. Use [ and ] for N and C terminus.</p>
+<p>Generates the fragment ions for a specified peptide. You can generate
+    for multiple peptides by seperating each peptide with a new line.</p>
+<p>Modifications can be input using either a location or a residue, and
+    a mass. Each modification should be seperated by a new line. Use [
+    and ] for N and C terminus.</p>
 <form method="get" action="#">
     <input type="hidden" name="page" value="peptide_properties" />
     <fieldset>
@@ -138,11 +140,10 @@ foreach ($sequences as $sequence) {
             $ions = $fragger->getIons();
             
             $ionIndex = $i;
-            if ($fragger->isReversed())
-            {
-                $ionIndex = $peptide->getLength() -($i - 1);
+            if ($fragger->isReversed()) {
+                $ionIndex = $peptide->getLength() - ($i - 1);
             }
-                
+            
             $ion = '∅';
             if (isset($ions[$ionIndex])) {
                 $ion = $ions[$ionIndex];

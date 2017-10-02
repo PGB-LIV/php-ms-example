@@ -31,8 +31,8 @@ if (isset($_FILES[FORM_FILE])) {
     }
     
     foreach ($reader as $protein) {
-        
         $peptides = $digest->digest($protein);
+        
         foreach ($peptides as $peptide) {
             if (! is_null($filter) && ! $filter->isValidPeptide($peptide)) {
                 continue;
@@ -47,14 +47,17 @@ if (isset($_FILES[FORM_FILE])) {
 ?>
 <h2>Protein Digestion</h2>
 
-<p>This tool allows you to upload a FASTA file and to generate a list of peptides as would be produced by the chosen enzyme. You may filter the peptides to those within a certain mass. The output will be a .csv file.</p>
+<p>This tool allows you to upload a FASTA file and to generate a list of
+    peptides as would be produced by the chosen enzyme. You may filter
+    the peptides to those within a certain mass. The output will be a
+    .csv file.</p>
 
-<form enctype="multipart/form-data" action="?page=protein_digest&amp;txtonly=1"
-    method="POST">
+<form enctype="multipart/form-data"
+    action="?page=protein_digest&amp;txtonly=1" method="POST">
 
     <fieldset>
-        <label for="fasta">FASTA File</label> <input name="<?php echo FORM_FILE; ?>"
-            type="file" id="fasta" />
+        <label for="fasta">FASTA File</label> <input
+            name="<?php echo FORM_FILE; ?>" type="file" id="fasta" />
     </fieldset>
 
     <fieldset>
@@ -69,8 +72,8 @@ if (isset($_FILES[FORM_FILE])) {
     </fieldset>
 
     <fieldset>
-        <label for="nme"><abbr title=" N-terminal Methionine Excision">NME</abbr></label><input type="checkbox" name="nme"
-            id="nme" value="1" />
+        <label for="nme"><abbr title=" N-terminal Methionine Excision">NME</abbr></label><input
+            type="checkbox" name="nme" id="nme" value="1" />
     </fieldset>
 
     <fieldset>

@@ -28,8 +28,7 @@ if (! empty($_FILES) || isset($_GET['search'])) {
         $name = $_FILES[FORM_FILE]['name'];
         $mzIdentMlFile = $_FILES[FORM_FILE]['tmp_name'];
         
-        if (substr_compare($_FILES[FORM_FILE]['name'], '.gz', strlen($_FILES[FORM_FILE]['name']) - 3, 
-            strlen($_FILES[FORM_FILE]['name'])) === 0) {
+        if (substr_compare($_FILES[FORM_FILE]['name'], '.gz', strlen($_FILES[FORM_FILE]['name']) - 3) === 0) {
             // This input should be from somewhere else, hard-coded in this example
             $file_name = $_FILES[FORM_FILE]['tmp_name'];
             
@@ -181,8 +180,8 @@ if (! empty($_FILES) || isset($_GET['search'])) {
                 break;
             }
             
-            echo '<thead><tr><th>Scan</th><th>m/z</th><th>z</th><th>Peptide</th><th>Protein</th><th>Mods</th>' . $scoresHeader .
-                 '</tr></thead><tbody>';
+            echo '<thead><tr><th>Scan</th><th>m/z</th><th>z</th><th>Peptide</th><th>Protein</th><th>Mods</th>' .
+                 $scoresHeader . '</tr></thead><tbody>';
             
             $headerShown = true;
         }
