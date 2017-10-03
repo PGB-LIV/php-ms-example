@@ -99,9 +99,9 @@ foreach ($sequences as $sequence) {
         $peptide->addModification($modification);
     }
     
-    echo '<h3>' . $peptide->getSequence() . '</h3>';
+    echo '<h3>' . wordwrap($peptide->getSequence(), 64, '<br />', true) . '</h3>';
     echo 'Length: ' . $peptide->getLength() . '<br />';
-    echo 'Mass: ' . $peptide->getMass() . 'Da<br />';
+    echo 'Mass: ' . number_format($peptide->getMass(), 4) . 'Da<br />';
     echo 'Formula: ' . preg_replace('/([0-9]+)/', '<sub>$1</sub>', $peptide->getMolecularFormula()) . '<br /><br />';
     
     $frags = array();

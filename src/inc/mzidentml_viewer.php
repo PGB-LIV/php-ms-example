@@ -169,10 +169,12 @@ if (! empty($_FILES) || isset($_GET['search'])) {
     echo '<table style="font-size:0.75em;" class="formattedTable hoverableRow">';
     
     $headerShown = false;
+    $scanTitleEnabled = false;
     
     foreach ($reader->getAnalysisData() as $spectra) {
         if (! $headerShown) {
             $scoresHeader = '';
+            
             foreach ($spectra->getIdentifications() as $identification) {
                 foreach ($identification->getScores() as $scoreName => $scoreValue) {
                     $scoresHeader .= '<th>' . $reader->getCvParamName($scoreName) . '</th>';
@@ -180,19 +182,34 @@ if (! empty($_FILES) || isset($_GET['search'])) {
                 break;
             }
             
-            echo '<thead><tr><th>Scan</th><th>m/z</th><th>z</th><th>Peptide</th><th>Protein</th><th>Mods</th>' .
-                 $scoresHeader . '</tr></thead><tbody>';
+            echo '<thead><tr>';
+            
+            if (! is_null($spectra->getTitle())) {
+                echo '<th>Scan</th>';
+                $scanTitleEnabled = true;
+            }
+            
+            echo '<th>m/z</th><th>z</th><th>Peptide</th><th>Protein</th><th>Mods</th>' . $scoresHeader .
+                 '</tr></thead><tbody>';
             
             $headerShown = true;
         }
         
         foreach ($spectra->getIdentifications() as $identification) {
-            echo '<tr>';
-            echo '<td style="font-weight: bold;">' . wordwrap($spectra->getTitle(), 32, '<br />', true) . '</td>';
+            if ($identification->getPeptide()->isDecoy()) {
+                echo '<tr class="decoy">';
+            } else {
+                echo '<tr>';
+            }
+            
+            if ($scanTitleEnabled) {
+                echo '<td style="font-weight: bold;">' . wordwrap($spectra->getTitle(), 32, '<br />', true) . '</td>';
+            }
+            
             echo '<td>' . number_format($spectra->getMassCharge(), 2) . '</td>';
             echo '<td>' . $spectra->getCharge() . '</td>';
             
-            echo '<td>' . wordwrap($identification->getPeptide()->getSequence(), 16, '<br />', true) . '</td>';
+            echo '<td class="sequence">' . wordwrap($identification->getPeptide()->getSequence(), 16, '<br />', true) . '</td>';
             echo '<td>' . $identification->getPeptide()
                 ->getProtein()
                 ->getAccession() . '</td>';
@@ -218,6 +235,8 @@ if (! empty($_FILES) || isset($_GET['search'])) {
     echo '</tbody></table>';
     
     ?>
+
+<p class="decoy">* Decoy results</p>
 
 <a name="proteins" />
 <h2>Protein Groups</h2>
