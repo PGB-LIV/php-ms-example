@@ -4,6 +4,7 @@ use pgb_liv\php_ms\Reader\FastaReader;
 use pgb_liv\php_ms\Core\Tolerance;
 use pgb_liv\php_ms\Utility\Filter\FilterMass;
 
+set_time_limit(600);
 define('FORM_FILE', 'fasta');
 
 if (isset($_FILES[FORM_FILE])) {

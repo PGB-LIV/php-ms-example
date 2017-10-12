@@ -101,7 +101,8 @@ foreach ($sequences as $sequence) {
     
     echo '<h3>' . wordwrap($peptide->getSequence(), 64, '<br />', true) . '</h3>';
     echo 'Length: ' . $peptide->getLength() . '<br />';
-    echo 'Mass: ' . number_format($peptide->getMass(), 4) . 'Da<br />';
+    echo 'Mass: ' . number_format($peptide->getMonoisotopicMass(), 4) . 'Da<br />';
+    echo 'Mass/Charge: ' . number_format($peptide->getMonoisotopicMassCharge($charge), 4) . 'Da<br />';
     echo 'Formula: ' . preg_replace('/([0-9]+)/', '<sub>$1</sub>', $peptide->getMolecularFormula()) . '<br /><br />';
     
     $frags = array();

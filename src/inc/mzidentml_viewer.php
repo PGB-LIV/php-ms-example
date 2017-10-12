@@ -59,7 +59,7 @@ if (! empty($_FILES) || isset($_GET['search'])) {
         $name = $_GET['name'];
     }
     
-    echo '<h1>' . $name . '</h1>';
+    echo '<h3>' . $name . '</h3>';
     
     $reader = MzIdentMlReaderFactory::getReader($mzIdentMlFile);
     ?>
@@ -71,7 +71,7 @@ if (! empty($_FILES) || isset($_GET['search'])) {
 </ul>
 
 <a name="software" />
-<h2>Software</h2>
+<h4>Software</h4>
 <?php
     foreach ($reader->getAnalysisSoftwareList() as $software) {
         echo $software['name'] . ' ';
@@ -84,16 +84,16 @@ if (! empty($_FILES) || isset($_GET['search'])) {
     ?>
 
 <a name="protocol" />
-<h2>Protocol</h2>
+<h4>Protocol</h4>
 
 <?php
     $protocolCollection = $reader->getAnalysisProtocolCollection();
     
     if (isset($protocolCollection['spectrum'])) {
-        echo '<h3>Spectrum Protocol</h3>';
+        echo '<h5>Spectrum Protocol</h5>';
         
         foreach ($protocolCollection['spectrum'] as $key => $protocol) {
-            echo '<h4>Software</h4>';
+            echo '<h6>Software</h6>';
             
             echo $protocol['software']['name'] . ' ';
             if (isset($protocol['software']['version'])) {
@@ -102,7 +102,7 @@ if (! empty($_FILES) || isset($_GET['search'])) {
             
             echo '<br />';
             if (isset($protocol['fragmentTolerance']) || isset($protocol['parentTolerance'])) {
-                echo '<h4>Tolerances</h4>';
+                echo '<h6>Tolerances</h6>';
                 
                 if (isset($protocol['fragmentTolerance'])) {
                     foreach ($protocol['fragmentTolerance'] as $tolerance) {
@@ -118,7 +118,7 @@ if (! empty($_FILES) || isset($_GET['search'])) {
             }
             
             if (isset($protocol['enzymes'])) {
-                echo '<h4>Enzymes</h4>';
+                echo '<h6>Enzymes</h6>';
                 
                 foreach ($protocol['enzymes'] as $enzyme) {
                     if (isset($enzyme['EnzymeName']['name'])) {
@@ -132,7 +132,7 @@ if (! empty($_FILES) || isset($_GET['search'])) {
             }
             
             if (isset($protocol['modifications'])) {
-                echo '<h4>Modifications</h4>';
+                echo '<h6>Modifications</h6>';
                 
                 foreach ($protocol['modifications'] as $modification) {
                     echo '[' . ($modification->isFixed() ? 'F' : 'V') . '] ' . $modification->getName() . ' (' .
@@ -149,14 +149,14 @@ if (! empty($_FILES) || isset($_GET['search'])) {
     }
     if (isset($protocolCollection['protein'])) {
         $protocol = $protocolCollection['protein'];
-        echo '<h3>Protein Protocol</h3>';
-        echo '<h4>Software</h4>';
+        echo '<h5>Protein Protocol</h5>';
+        echo '<h6>Software</h6>';
         
         echo $protocol['software']['name'] . ' ';
         if (isset($protocol['software']['version'])) {
             echo $protocol['software']['version'];
         }
-        echo '<h4>Threshold</h4>';
+        echo '<h6>Threshold</h6>';
         
         foreach ($protocol['threshold'] as $threshold) {
             echo $threshold[MzIdentMlReader1r1::CV_ACCESSION] . ': ' . $threshold['name'];
@@ -164,14 +164,17 @@ if (! empty($_FILES) || isset($_GET['search'])) {
     }
     ?>
 <a name="peptides" />
-<h2>Peptide Spectrum Matches</h2>
+<h4>Peptide Spectrum Matches</h4>
 <?php
     echo '<table style="font-size:0.75em;" class="formattedTable hoverableRow">';
     
     $headerShown = false;
     $scanTitleEnabled = false;
-    
-    foreach ($reader->getAnalysisData() as $spectra) {
+    $peptideCount = 0;
+    $decoyCount = 0;
+    $data = $reader->getAnalysisData();
+    ksort($data);
+    foreach ($data as $spectraId => $spectra) {
         if (! $headerShown) {
             $scoresHeader = '';
             
@@ -187,6 +190,8 @@ if (! empty($_FILES) || isset($_GET['search'])) {
             if (! is_null($spectra->getTitle())) {
                 echo '<th>Scan</th>';
                 $scanTitleEnabled = true;
+            } else {
+                echo '<th>ID</th>';
             }
             
             echo '<th>m/z</th><th>z</th><th>Peptide</th><th>Protein</th><th>Mods</th>' . $scoresHeader .
@@ -198,21 +203,25 @@ if (! empty($_FILES) || isset($_GET['search'])) {
         foreach ($spectra->getIdentifications() as $identification) {
             if ($identification->getPeptide()->isDecoy()) {
                 echo '<tr class="decoy">';
+                $decoyCount ++;
             } else {
                 echo '<tr>';
+                $peptideCount ++;
             }
             
             if ($scanTitleEnabled) {
                 echo '<td style="font-weight: bold;">' . wordwrap($spectra->getTitle(), 32, '<br />', true) . '</td>';
+            } else {
+                echo '<td style="font-weight: bold;">' . wordwrap($spectraId, 32, '<br />', true) . '</td>';
             }
             
             echo '<td>' . number_format($spectra->getMassCharge(), 2) . '</td>';
             echo '<td>' . $spectra->getCharge() . '</td>';
             
-            echo '<td class="sequence">' . wordwrap($identification->getPeptide()->getSequence(), 16, '<br />', true) . '</td>';
-            echo '<td>' . $identification->getPeptide()
-                ->getProtein()
-                ->getAccession() . '</td>';
+            echo '<td class="sequence">' . wordwrap($identification->getPeptide()->getSequence(), 16, '<br />', true) .
+                 '</td>';
+            $proteins = $identification->getPeptide()->getProteins();
+            echo '<td>' . $proteins[0]->getProtein()->getAccession() . '</td>';
             
             echo '<td>';
             $mods = array();
@@ -236,10 +245,12 @@ if (! empty($_FILES) || isset($_GET['search'])) {
     
     ?>
 
-<p class="decoy">* Decoy results</p>
+<p><?php echo $peptideCount; ?> peptide spectrum matches and <span
+        class="decoy"><?php echo $decoyCount?> decoy spectrum matches</span>
+</p>
 
 <a name="proteins" />
-<h2>Protein Groups</h2>
+<h4>Protein Groups</h4>
 
 <p>Each table shows the protein accession and the associated peptide
     evidence within the group.</p>
