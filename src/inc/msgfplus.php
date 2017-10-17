@@ -113,6 +113,9 @@ if (isset($_FILES['mgf']) && $_FILES['mgf']['error'] == 0) {
 <h2>MS-GF+ Search</h2>
 
 <?php
+if (! empty($_FILES) && $_FILES['mgf']['error'] != 0) {
+    die('<p>An error occured. Ensure you included a file to upload.</p>');
+}
 
 if (empty($fastaFiles)) {
     echo '<p>No FASTA files on server. To enable this page you need to place .fasta files in /conf/fasta</p>';

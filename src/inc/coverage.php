@@ -9,6 +9,11 @@ define('FORM_MZIDENTML', 'mzidentml');
 define('FORM_FASTA', 'fasta');
 ?>
 <h2>Sequence Coverage</h2>
+<?php
+if (! empty($_FILES) && ($_FILES[FORM_MZIDENTML]['error'] != 0 || $_FILES[FORM_FASTA]['error'] != 0)) {
+    echo '<p>An error occured. Ensure you included a file to upload.</p>';
+}
+?>
 
 <form enctype="multipart/form-data" action="?page=coverage"
     method="POST">
@@ -28,37 +33,35 @@ define('FORM_FASTA', 'fasta');
 </form>
 <?php
 
-if (! empty($_FILES)) {
-    if (! empty($_FILES)) {
-        $name = $_FILES[FORM_MZIDENTML]['name'];
-        $mzIdentMlFile = $_FILES[FORM_MZIDENTML]['tmp_name'];
+if (! empty($_FILES) && $_FILES[FORM_MZIDENTML]['error'] == 0 && $_FILES[FORM_FASTA]['error'] == 0) {
+    $name = $_FILES[FORM_MZIDENTML]['name'];
+    $mzIdentMlFile = $_FILES[FORM_MZIDENTML]['tmp_name'];
+    
+    if (substr_compare($_FILES[FORM_MZIDENTML]['name'], '.gz', strlen($_FILES[FORM_MZIDENTML]['name']) - 3) === 0) {
+        // This input should be from somewhere else, hard-coded in this example
+        $file_name = $_FILES[FORM_MZIDENTML]['tmp_name'];
         
-        if (substr_compare($_FILES[FORM_MZIDENTML]['name'], '.gz', strlen($_FILES[FORM_MZIDENTML]['name']) - 3) === 0) {
-            // This input should be from somewhere else, hard-coded in this example
-            $file_name = $_FILES[FORM_MZIDENTML]['tmp_name'];
-            
-            // Raising this value may increase performance
-            // read 4kb at a time
-            $buffer_size = 4096;
-            $out_file_name = $file_name . '_decom';
-            
-            // Open our files (in binary mode)
-            $file = gzopen($file_name, 'rb');
-            $out_file = fopen($out_file_name, 'wb');
-            
-            // Keep repeating until the end of the input file
-            while (! gzeof($file)) {
-                // Read buffer-size bytes
-                // Both fwrite and gzread and binary-safe
-                fwrite($out_file, gzread($file, $buffer_size));
-            }
-            
-            // Files are done, close files
-            fclose($out_file);
-            gzclose($file);
-            
-            $mzIdentMlFile = $out_file_name;
+        // Raising this value may increase performance
+        // read 4kb at a time
+        $buffer_size = 4096;
+        $out_file_name = $file_name . '_decom';
+        
+        // Open our files (in binary mode)
+        $file = gzopen($file_name, 'rb');
+        $out_file = fopen($out_file_name, 'wb');
+        
+        // Keep repeating until the end of the input file
+        while (! gzeof($file)) {
+            // Read buffer-size bytes
+            // Both fwrite and gzread and binary-safe
+            fwrite($out_file, gzread($file, $buffer_size));
         }
+        
+        // Files are done, close files
+        fclose($out_file);
+        gzclose($file);
+        
+        $mzIdentMlFile = $out_file_name;
     }
     ?>
 <h3><?php echo $name; ?></h3>

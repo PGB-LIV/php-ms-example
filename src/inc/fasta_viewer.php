@@ -15,7 +15,9 @@ use pgb_liv\php_ms\Reader\FastaReader;
     </fieldset>
 </form>
 <?php
-if (isset($_FILES['fasta'])) {
+if (! empty($_FILES) && $_FILES['fasta']['error'] != 0) {
+    die('<p>An error occured. Ensure you included a file to upload.</p>');
+} elseif (! empty($_FILES) && $_FILES['fasta']['error'] == 0) {
     $fastaFile = $_FILES['fasta']['tmp_name'];
     
     $reader = new FastaReader($fastaFile);

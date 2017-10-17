@@ -11,7 +11,7 @@ set_time_limit(3600);
 
 define('FORM_FILE', 'mgf');
 
-if (isset($_FILES[FORM_FILE])) {
+if (! empty($_FILES) && $_FILES[FORM_FILE]['error'] == 0) {
     $filters = array();
     
     if ($_POST['charge_min'] != 'ANY' || $_POST['charge_max'] != 'ANY') {
@@ -64,6 +64,11 @@ if (isset($_FILES[FORM_FILE])) {
 }
 ?>
 <h2>MGF Filter</h2>
+<?php
+if (! empty($_FILES) && $_FILES[FORM_FILE]['error'] != 0) {
+    die('<p>An error occured. Ensure you included a file to upload.</p>');
+}
+?>
 <p>This tool allows you to upload an MGF file and filter it by the specified options. A new MGF file will be generated that you can download.</p>
 
 <form enctype="multipart/form-data"

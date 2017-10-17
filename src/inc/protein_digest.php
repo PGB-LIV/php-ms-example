@@ -7,7 +7,7 @@ use pgb_liv\php_ms\Utility\Filter\FilterMass;
 set_time_limit(600);
 define('FORM_FILE', 'fasta');
 
-if (isset($_FILES[FORM_FILE])) {
+if (! empty($_FILES) && $_FILES[FORM_FILE]['error'] == 0) {
     header('Content-type: text/plain;');
     header('Content-Disposition: attachment; filename="' . $_FILES[FORM_FILE]['name'] . '.csv"');
     
@@ -47,7 +47,11 @@ if (isset($_FILES[FORM_FILE])) {
 }
 ?>
 <h2>Protein Digestion</h2>
-
+<?php
+if (! empty($_FILES) && $_FILES[FORM_FILE]['error'] != 0) {
+    die('<p>An error occured. Ensure you included a file to upload.</p>');
+}
+?>
 <p>This tool allows you to upload a FASTA file and to generate a list of
     peptides as would be produced by the chosen enzyme. You may filter
     the peptides to those within a certain mass. The output will be a

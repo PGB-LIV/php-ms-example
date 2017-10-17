@@ -8,6 +8,11 @@ set_time_limit(600);
 define('FORM_FILE', 'mzidentml');
 ?>
 <h2>mzIdentML Viewer</h2>
+<?php
+if (! empty($_FILES) && $_FILES[FORM_FILE]['error'] != 0) {
+    die('<p>An error occured. Ensure you included a file to upload.</p>');
+}
+?>
 
 <form enctype="multipart/form-data" action="?page=mzidentml_viewer"
     method="POST">
@@ -23,7 +28,7 @@ define('FORM_FILE', 'mzidentml');
 </form>
 <?php
 
-if (! empty($_FILES) || isset($_GET['search'])) {
+if ((! empty($_FILES) && $_FILES[FORM_FILE]['error'] == 0) || isset($_GET['search'])) {
     if (! empty($_FILES)) {
         $name = $_FILES[FORM_FILE]['name'];
         $mzIdentMlFile = $_FILES[FORM_FILE]['tmp_name'];

@@ -15,7 +15,9 @@ use pgb_liv\php_ms\Reader\MgfReader;
     </fieldset>
 </form>
 <?php
-if (isset($_FILES['mgf'])) {
+if (! empty($_FILES) && $_FILES['mgf']['error'] != 0) {
+    die('<p>An error occured. Ensure you included a file to upload.</p>');
+} elseif (! empty($_FILES) && $_FILES['mgf']['error'] == 0) {
     $mgfFile = $_FILES['mgf']['tmp_name'];
     
     $reader = new MgfReader($mgfFile);
