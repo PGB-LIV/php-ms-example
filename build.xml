@@ -58,6 +58,7 @@
 		<delete dir="${basedir}/build/phpdox" />
 		<delete file="${basedir}/build/composer.lock" />
 		<delete dir="${basedir}/src/vendor" />
+		<delete file="${basedir}/composer.lock" />
 		<property name="clean.done" value="true" />
 	</target>
 

@@ -37,14 +37,19 @@ if (! empty($_FILES) && $_FILES[FORM_FILE]['error'] == 0) {
         $mzIdentMlFile = $out_file_name;
     }
     
+    $startTime = microtime(true);
     $reader = MzIdentMlReaderFactory::getReader($mzIdentMlFile);
     
     header('Content-type: text/plain;');
     header('Content-Disposition: attachment; filename="' . $_FILES[FORM_FILE]['name'] . '.pro.bed"');
     
-    $proBed = new ProBedWriter('php://output', $name);
-    
     $data = $reader->getAnalysisData();
+    
+    $headers = array(
+        'Converted from ' . $_FILES[FORM_FILE]['name'] . ' in ' . (microtime(true) - $startTime) . ' seconds'
+    );
+    
+    $proBed = new ProBedWriter('php://output', $name, $headers);
     foreach ($data as $spectra) {
         $proBed->write($spectra);
     }
