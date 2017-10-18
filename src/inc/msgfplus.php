@@ -4,20 +4,21 @@ use pgb_liv\php_ms\Search\Parameters\MsgfPlusSearchParameters;
 use pgb_liv\php_ms\Core\Modification;
 use pgb_liv\php_ms\Core\Tolerance;
 
-error_reporting(E_ALL);
-ini_set('display_errors', true);
 set_time_limit(3600);
 
+// TODO: Move to a general config
 define('MSGF_JAR', '/mnt/nas/_CLUSTER_SOFTWARE/ms-gf+/current/MSGFPlus.jar');
 define('MSGF_THREADS', 6);
 
-$files = scandir('conf/fasta');
 $fastaFiles = array();
-
-foreach ($files as $file) {
-    $info = pathinfo($file);
-    if ($info['extension'] == 'fasta' && stripos($info['filename'], 'revcat') === false) {
-        $fastaFiles[$file] = $info['filename'];
+if (file_exists('conf/fasta')) {
+    $files = scandir('conf/fasta');
+    
+    foreach ($files as $file) {
+        $info = pathinfo($file);
+        if ($info['extension'] == 'fasta' && stripos($info['filename'], 'revcat') === false) {
+            $fastaFiles[$file] = $info['filename'];
+        }
     }
 }
 
