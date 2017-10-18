@@ -33,10 +33,10 @@ if (! empty($_FILES) && $_FILES['fasta']['error'] != 0) {
     
     foreach ($organisms as $name => $proteins) {
         echo '<h2>' . $name . '</h2>';
-        echo '<table class="formattedTable"><thead><tr><th>Accession</th><th>Entry Name</th><th>Description</th><th>Gene</th><th>Sequence Version</th></tr></thead><tbody>';
+        echo '<table class="formattedTable"><thead><tr><th>Identifier</th><th>Entry Name</th><th>Description</th><th>Gene</th><th>Sequence Version</th></tr></thead><tbody>';
         foreach ($proteins as $protein) {
             echo '<tr><td>';
-            echo $protein->getAccession();
+            echo $protein->getUniqueIdentifier();
             echo '</td><td>';
             echo $protein->getEntryName();
             echo '</td><td>';
