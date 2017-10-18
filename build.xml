@@ -68,7 +68,7 @@
 		<mkdir dir="${basedir}/build/logs" />
 		<mkdir dir="${basedir}/build/pdepend" />
 		<mkdir dir="${basedir}/build/phpdox" />
-		<mkdir dir="${basedir}/conf/fasta" />
+		<mkdir dir="${basedir}/src/conf/fasta" />
 		<get src="http://www.uniprot.org/uniprot/?sort=&amp;desc=&amp;compress=no&amp;query=proteome:UP000000589%20reviewed:yes&amp;fil=&amp;format=fasta&amp;force=yes" 
 			dest="${basedir}/src/conf/fasta/Mus musculus.fasta" verbose="on" />
 		<get src="http://www.uniprot.org/uniprot/?sort=&amp;desc=&amp;compress=no&amp;query=proteome:UP000005640%20reviewed:yes&amp;fil=&amp;format=fasta&amp;force=yes" 
