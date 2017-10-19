@@ -66,8 +66,13 @@ if (! empty($_FILES) && $_FILES[FORM_FILE]['error'] != 0) {
 }
 ?>
 
-<p>Converts an mzIdentML file into the proBed format. Only entries which
-    contain chromosome information will be converted.</p>
+<p>Converts an mzIdentML file into the proBed format. This converter will only function for mzIdentML 1.2 files,
+    supporting the proteogenomics feature. See the <a
+        href="https://github.com/HUPO-PSI/mzIdentML/blob/master/specification_document/specdoc1_2/mzIdentML1%202.0-release.pdf">mzIdentML
+        1.2 specifications</a> and <a
+        href="http://www.mcponline.org/content/16/7/1275.full">manuscript</a>
+    for more details.
+</p>
 
 <form enctype="multipart/form-data" action="?page=mzid2probed&txtonly=1"
     method="POST">

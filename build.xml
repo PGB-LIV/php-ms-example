@@ -70,11 +70,11 @@
 		<mkdir dir="${basedir}/build/phpdox" />
 		<mkdir dir="${basedir}/src/conf/fasta" />
 		<get src="http://www.uniprot.org/uniprot/?sort=&amp;desc=&amp;compress=no&amp;query=proteome:UP000000589%20reviewed:yes&amp;fil=&amp;format=fasta&amp;force=yes" 
-			dest="${basedir}/src/conf/fasta/Mus musculus.fasta" verbose="on" />
+			dest="${basedir}/src/conf/fasta/Mus musculus.fasta" />
 		<get src="http://www.uniprot.org/uniprot/?sort=&amp;desc=&amp;compress=no&amp;query=proteome:UP000005640%20reviewed:yes&amp;fil=&amp;format=fasta&amp;force=yes" 
-			dest="${basedir}/src/conf/fasta/Homo sapiens.fasta" verbose="on" />
+			dest="${basedir}/src/conf/fasta/Homo sapiens.fasta" />
 		<get src="http://www.uniprot.org/uniprot/?sort=&amp;desc=&amp;compress=no&amp;query=proteome:UP000002311%20reviewed:yes&amp;fil=&amp;format=fasta&amp;force=yes" 
-			dest="${basedir}/src/conf/fasta/Saccharomyces cerevisiae.fasta" verbose="on" />
+			dest="${basedir}/src/conf/fasta/Saccharomyces cerevisiae.fasta"  />
 		<exec executable="${composer}" taskname="composer">
 			<arg value="install" />
 		</exec>

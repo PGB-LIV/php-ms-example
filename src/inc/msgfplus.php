@@ -150,7 +150,7 @@ if (empty($fastaFiles)) {
             <option>0.1 Da</option>
             <option>0.5 Da</option>
             <option>1.0 Da</option>
-            <option>5 ppm</option>
+            <option selected="selected">5 ppm</option>
             <option>10 ppm</option>
             <option>15 ppm</option>
             <option>20 ppm</option>
