@@ -7,6 +7,7 @@ use pgb_liv\php_ms\Utility\Fragment\CFragment;
 use pgb_liv\php_ms\Utility\Fragment\AFragment;
 use pgb_liv\php_ms\Utility\Fragment\XFragment;
 use pgb_liv\php_ms\Core\Modification;
+use pgb_liv\php_ms\Utility\Fragment\FragmentFactory;
 
 $sequence = 'PEPTIDE';
 if (isset($_REQUEST['sequence'])) {
@@ -53,6 +54,11 @@ for ($i = 0; $i < count($modificationPositions); $i ++) {
     
     $modifications[] = $modification;
 }
+
+$fragmentMethod = 'All';
+if (isset($_REQUEST['fragmentMethod'])) {
+    $fragmentMethod = $_REQUEST['fragmentMethod'];
+}
 ?>
 <h2>MS Fragment Ion Generator</h2>
 
@@ -90,6 +96,21 @@ for ($i = 0; $i < count($modificationPositions); $i ++) {
         <textarea name="modificationMass" style="width: 8em;"><?php echo $modificationMass; ?></textarea>
     </fieldset>
     <fieldset>
+        <label for="fragmentMethod">Fragment Method</label> <select
+            name="fragmentMethod" id="fragmentMethod">
+            <option
+                <?php $fragmentMethod == 'All' ? ' selected="selected"' : ''; ?>>All</option>
+<?php
+foreach (FragmentFactory::getFragmentMethods() as $method) {
+    echo '<option';
+    echo $fragmentMethod == $method ? ' selected="selected"' : '';
+    echo '>' . $method . '</option>' . PHP_EOL;
+}
+?>
+        
+        </select>
+    </fieldset>
+    <fieldset>
         <input type="submit" value="Submit" />
     </fieldset>
 </form>
@@ -107,15 +128,19 @@ foreach ($sequences as $sequence) {
     echo 'Mass/Charge: ' . number_format($peptide->getMonoisotopicMassCharge($charge), 4) . 'Da<br />';
     echo 'Formula: ' . preg_replace('/([0-9]+)/', '<sub>$1</sub>', $peptide->getMolecularFormula()) . '<br /><br />';
     
-    $frags = array();
-    $frags['B Ions'] = new BFragment($peptide);
-    $frags['Y Ions'] = new YFragment($peptide);
-    
-    $frags['C Ions'] = new CFragment($peptide);
-    $frags['Z Ions'] = new ZFragment($peptide);
-    
-    $frags['A Ions'] = new AFragment($peptide);
-    $frags['X Ions'] = new XFragment($peptide);
+    if ($fragmentMethod == 'All') {
+        $frags = array();
+        $frags['B'] = new BFragment($peptide);
+        $frags['Y'] = new YFragment($peptide);
+        
+        $frags['C'] = new CFragment($peptide);
+        $frags['Z'] = new ZFragment($peptide);
+        
+        $frags['A'] = new AFragment($peptide);
+        $frags['X'] = new XFragment($peptide);
+    } else {
+        $frags = FragmentFactory::getMethodFragments($fragmentMethod, $peptide);
+    }
     ?>
 <h4>Fragments</h4>
 
@@ -125,7 +150,7 @@ foreach ($sequences as $sequence) {
     echo '<tr>';
     foreach ($frags as $type => $fragger) {
         ?>
-            <th colspan="2"><?php echo $type; ?></th>
+            <th colspan="2"><?php echo $type; ?> Ions</th>
         <?php
     }
     echo '</tr><tr>';
