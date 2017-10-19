@@ -75,7 +75,7 @@ if ((! empty($_FILES) && $_FILES[FORM_FILE]['error'] == 0) || isset($_GET['searc
     <li><a href="#proteins">Protein Groups</a></li>
 </ul>
 
-<a name="software" />
+<a id="software"></a>
 <h4>Software</h4>
 <?php
     foreach ($reader->getAnalysisSoftwareList() as $software) {
@@ -88,7 +88,7 @@ if ((! empty($_FILES) && $_FILES[FORM_FILE]['error'] == 0) || isset($_GET['searc
     }
     ?>
 
-<a name="protocol" />
+<a id="protocol"></a>
 <h4>Protocol</h4>
 
 <?php
@@ -168,7 +168,7 @@ if ((! empty($_FILES) && $_FILES[FORM_FILE]['error'] == 0) || isset($_GET['searc
         }
     }
     ?>
-<a name="peptides" />
+<a id="peptides"></a>
 <h4>Peptide Spectrum Matches</h4>
 <?php
     echo '<table style="font-size:0.75em;" class="formattedTable hoverableRow">';
@@ -254,7 +254,7 @@ if ((! empty($_FILES) && $_FILES[FORM_FILE]['error'] == 0) || isset($_GET['searc
         class="decoy"><?php echo $decoyCount?> decoy spectrum matches</span>
 </p>
 
-<a name="proteins" />
+<a id="proteins"></a>
 <h4>Protein Groups</h4>
 
 <p>Each table shows the protein accession and the associated peptide
