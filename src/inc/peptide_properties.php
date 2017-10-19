@@ -4,6 +4,8 @@ use pgb_liv\php_ms\Utility\Fragment\BFragment;
 use pgb_liv\php_ms\Utility\Fragment\ZFragment;
 use pgb_liv\php_ms\Utility\Fragment\YFragment;
 use pgb_liv\php_ms\Utility\Fragment\CFragment;
+use pgb_liv\php_ms\Utility\Fragment\AFragment;
+use pgb_liv\php_ms\Utility\Fragment\XFragment;
 use pgb_liv\php_ms\Core\Modification;
 
 $sequence = 'PEPTIDE';
@@ -107,9 +109,13 @@ foreach ($sequences as $sequence) {
     
     $frags = array();
     $frags['B Ions'] = new BFragment($peptide);
-    $frags['Z Ions'] = new ZFragment($peptide);
-    $frags['C Ions'] = new CFragment($peptide);
     $frags['Y Ions'] = new YFragment($peptide);
+    
+    $frags['C Ions'] = new CFragment($peptide);
+    $frags['Z Ions'] = new ZFragment($peptide);
+    
+    $frags['A Ions'] = new AFragment($peptide);
+    $frags['X Ions'] = new XFragment($peptide);
     ?>
 <h4>Fragments</h4>
 
