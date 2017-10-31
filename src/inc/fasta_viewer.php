@@ -30,8 +30,19 @@ if (! empty($_FILES) && $_FILES['fasta']['error'] != 0) {
             $organisms['Unknown Organism'][] = $protein;
         }
     }
-    
+?>
+<ul style="float: right;">
+<?php
+
+foreach (array_keys($organisms) as $name) {
+    echo '<li><a href="#'.($name).'">'.$name.'</a></li>';
+}
+    ?>
+</ul>
+
+<?php    
     foreach ($organisms as $name => $proteins) {
+        echo '<a id="'.($name).'"></a>';
         echo '<h2>' . $name . '</h2>';
         echo '<table class="formattedTable"><thead><tr><th>Identifier</th><th>Entry Name</th><th>Description</th><th>Gene</th><th>Sequence Version</th></tr></thead><tbody>';
         foreach ($proteins as $protein) {

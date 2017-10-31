@@ -22,7 +22,7 @@ if (! empty($_FILES) && $_FILES['mgf']['error'] != 0) {
     
     $reader = new MgfReader($mgfFile);
     
-    echo '<table class="formattedTable hoverableRow"><thead><tr><th>Title</th><th>m/z</th><th>z</th><th>RT</th><th>Fragments</th></tr></thead><tbody>';
+    echo '<table class="formattedTable hoverableRow"><thead><tr><th>Title</th><th>m/z</th><th>z</th><th><abbr title="Retention Time">RT</abbr> (sec)</th><th>Fragments</th></tr></thead><tbody>';
     
     foreach ($reader as $spectra) {
         echo '<tr><td>';

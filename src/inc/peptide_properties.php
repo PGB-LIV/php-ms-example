@@ -130,14 +130,13 @@ foreach ($sequences as $sequence) {
     
     if ($fragmentMethod == 'All') {
         $frags = array();
-        $frags['B'] = new BFragment($peptide);
-        $frags['Y'] = new YFragment($peptide);
-        
-        $frags['C'] = new CFragment($peptide);
-        $frags['Z'] = new ZFragment($peptide);
-        
         $frags['A'] = new AFragment($peptide);
+        $frags['B'] = new BFragment($peptide);
+        $frags['C'] = new CFragment($peptide);        
+        
         $frags['X'] = new XFragment($peptide);
+        $frags['Y'] = new YFragment($peptide);
+        $frags['Z'] = new ZFragment($peptide);
     } else {
         $frags = FragmentFactory::getMethodFragments($fragmentMethod, $peptide);
     }
@@ -172,11 +171,12 @@ foreach ($sequences as $sequence) {
             $ions = $fragger->getIons();
             
             $ionIndex = $i;
+            $sequenceIndex = $i;
             if ($fragger->isReversed()) {
-                $ionIndex = $peptide->getLength() - ($i - 1);
+                $sequenceIndex = $peptide->getLength() - ($i - 1);
             }
             
-            $ion = '∅';
+            $ion = '&empty;';
             if (isset($ions[$ionIndex])) {
                 $ion = $ions[$ionIndex];
                 
@@ -189,7 +189,7 @@ foreach ($sequences as $sequence) {
                 $ion = number_format($ion, 6);
             }
             
-            echo '<td>' . $sequence[$ionIndex - 1] . '</td><td>' . $ion . '</td>';
+            echo '<td>' . $sequence[$sequenceIndex - 1] . '</td><td>' . $ion . '</td>';
         }
         
         echo '</tr>';
