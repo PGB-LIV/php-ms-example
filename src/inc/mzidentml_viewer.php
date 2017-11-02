@@ -2,6 +2,7 @@
 use pgb_liv\php_ms\Reader\MzIdentMlReaderFactory;
 use pgb_liv\php_ms\Reader\MzIdentMlReader1r1;
 use pgb_liv\php_ms\Core\Modification;
+use pgb_liv\php_ms\Reader\HupoPsi\PsiVerb;
 
 set_time_limit(600);
 
@@ -164,7 +165,7 @@ if ((! empty($_FILES) && $_FILES[FORM_FILE]['error'] == 0) || isset($_GET['searc
         echo '<h6>Threshold</h6>';
         
         foreach ($protocol['threshold'] as $threshold) {
-            echo $threshold[MzIdentMlReader1r1::CV_ACCESSION] . ': ' . $threshold['name'];
+            echo $threshold[PsiVerb::CV_ACCESSION] . ': ' . $threshold['name'];
         }
     }
     ?>
