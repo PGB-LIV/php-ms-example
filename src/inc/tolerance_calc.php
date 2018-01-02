@@ -69,11 +69,11 @@ if ($toleranceUnit == Tolerance::PPM) {
 
 <form method="post" action="?page=tolerance_calc">
     <fieldset>
-        <label for="massA"> Mass A</label> <input type="text"
+        <label for="massA">Observed Mass</label> <input type="text"
             name="massA" id="massA" value="<?php echo $massA; ?>" />Da
     </fieldset>
     <fieldset>
-        <label for="massB">Mass B</label> <input type="text"
+        <label for="massB">Expected Mass</label> <input type="text"
             name="massB" id="massB" value="<?php echo $massB; ?>" />Da
     </fieldset>
     <fieldset>
@@ -83,9 +83,7 @@ if ($toleranceUnit == Tolerance::PPM) {
 
 <p class="centreText">
 <?php
-$tolerance = new Tolerance(abs($massA - $massB), Tolerance::DA);
-
 echo 'The mass difference of <strong>' . $massA . 'Da</strong> and <strong>' . $massB . 'Da</strong><br />';
-echo 'In Daltons, <strong>' . round($tolerance->getDaltonDelta($massB), 5) . ' Da</strong><br />';
-echo 'In ppm, <strong>' . round($tolerance->getPpmDelta($massB), 5) . ' ppm</strong>';
+echo 'In Daltons, <strong>' . round($massA - $massB, 5) . ' Da</strong><br />';
+echo 'In ppm, <strong>' . round(Tolerance::getDifferencePpm($massA, $massB), 5) . ' ppm</strong>';
 ?></p>

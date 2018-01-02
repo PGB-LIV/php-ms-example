@@ -1,6 +1,5 @@
 <?php
 use pgb_liv\php_ms\Reader\MzIdentMlReaderFactory;
-use pgb_liv\php_ms\Reader\MzIdentMlReader1r1;
 use pgb_liv\php_ms\Core\Modification;
 use pgb_liv\php_ms\Reader\HupoPsi\PsiVerb;
 
@@ -14,6 +13,8 @@ if (! empty($_FILES) && $_FILES[FORM_FILE]['error'] != 0) {
     die('<p>An error occured. Ensure you included a file to upload.</p>');
 }
 ?>
+
+<p>Note, only mzIdentML 1.1 and 1.2 are currently supported.</p>
 
 <form enctype="multipart/form-data" action="?page=mzidentml_viewer"
     method="POST">
@@ -188,6 +189,7 @@ if ((! empty($_FILES) && $_FILES[FORM_FILE]['error'] == 0) || isset($_GET['searc
                 foreach ($identification->getScores() as $scoreName => $scoreValue) {
                     $scoresHeader .= '<th>' . $reader->getCvParamName($scoreName) . '</th>';
                 }
+                
                 break;
             }
             

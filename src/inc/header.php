@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<title>PhpMs Demo Suite</title>
+<title>phpMs Demo Suite</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="theme-color" content="#009688" />
@@ -16,7 +16,7 @@ html, body, h1, h2, h3, h4, h5, h6 {
 
     <div id="pagecontainer">
 
-<h1>phpMs Demo Suite</h1>
+        <a href="?page=welcome"><h1>phpMs Demo Suite</h1></a>
         <div id="grid">
 
             <ul id="navigation">

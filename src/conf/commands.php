@@ -11,3 +11,4 @@ $_COMMANDS['tolerance_calc'] = 'Tolerance Calculator';
 $_COMMANDS['msgfplus'] = 'MS-GF+ Search';
 $_COMMANDS['coverage'] = 'Sequence Coverage';
 $_COMMANDS['mzid2probed'] = 'mzIdentML to proBed';
+$_COMMANDS['spectra_annotator'] = 'Spectra Annotator';

@@ -15,6 +15,11 @@ if (! empty($_FILES) && ($_FILES[FORM_MZIDENTML]['error'] != 0 || $_FILES[FORM_F
 }
 ?>
 
+<p>Calculate the protein-level sequence coverage from an mzIdentML file
+    (must contain protein group results) and the corresponding FASTA
+    file.</p>
+<p>Note, only mzIdentML 1.1 and 1.2 are currently supported.</p>
+
 <form enctype="multipart/form-data" action="?page=coverage"
     method="POST">
     <fieldset>
@@ -109,7 +114,6 @@ if (! empty($_FILES) && $_FILES[FORM_MZIDENTML]['error'] == 0 && $_FILES[FORM_FA
     
     echo '<dl style="float: right;">';
     foreach ($modLookup as $name => $properties) {
-        
         echo '<dt class="sequence" style="background-color: #' . $properties['colour'] . '">' . $properties['abbr'] .
              '</dt>';
         echo '<dd>' . $name . '</dd>';
@@ -120,8 +124,21 @@ if (! empty($_FILES) && $_FILES[FORM_MZIDENTML]['error'] == 0 && $_FILES[FORM_FA
     foreach ($peptides as $accession => $hits) {
         // Skip decoy
         if (! isset($proteins[$accession])) {
-            continue;
+            // Check if some element has been dropped
+            $isFound = false;
+            foreach (array_keys($proteins) as $protein) {
+                if (strpos($protein, $accession) !== false) {
+                    $accession = $protein;
+                    $isFound = true;
+                    break;
+                }
+            }
+            
+            if (! $isFound) {
+                continue;
+            }
         }
+        
         echo '<h4>' . $accession . '</h4>';
         
         $sequence = $proteins[$accession];

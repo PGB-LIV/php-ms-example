@@ -56,7 +56,15 @@ if (! empty($_FILES) && $_FILES[FORM_FILE]['error'] != 0) {
     peptides as would be produced by the chosen enzyme. You may filter
     the peptides to those within a certain mass. The output will be a
     .csv file.</p>
+<p>
 
+    The <abbr title="N-terminal Methionine Excision">NME</abbr> option
+    sets whether NME should be performed. When enabled any methionine at
+    the n-terminus of a protein will be removed. Both the excised and
+    non-excised peptide will be returned after digestion. Note, protein
+    sequence which do not contain a methionine at the n-terminus will be
+    unaffected.
+</p>
 <form enctype="multipart/form-data"
     action="?page=protein_digest&amp;txtonly=1" method="POST">
 
@@ -77,8 +85,8 @@ if (! empty($_FILES) && $_FILES[FORM_FILE]['error'] != 0) {
     </fieldset>
 
     <fieldset>
-        <label for="nme"><abbr title=" N-terminal Methionine Excision">NME</abbr></label><input
-            type="checkbox" name="nme" id="nme" value="1" />
+        <label for="nme">N-terminal Methionine Excision</label><input type="checkbox" name="nme"
+            id="nme" value="1" />
     </fieldset>
 
     <fieldset>
@@ -88,7 +96,7 @@ if (! empty($_FILES) && $_FILES[FORM_FILE]['error'] != 0) {
 
     <fieldset>
         <label for="mass">Mass Value</label> <input type="text"
-            name="mass" id="mass" value="" /> &plusmn; <input
+            name="mass" id="mass" value="" /> Da &plusmn; <input
             type="text" name="ppm" id="ppm" value="5" class="smallInput" />
         ppm
     </fieldset>

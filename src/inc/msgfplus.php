@@ -96,6 +96,14 @@ if (isset($_FILES['mgf']) && $_FILES['mgf']['error'] == 0) {
         $parameters->setDecoyEnabled(true);
     }
     
+    if (isset($_POST['instrument'])) {
+        $parameters->setMs2DetectorId((int) $_POST['instrument']);
+    }
+    
+    if (isset($_POST['enzyme'])) {
+        $parameters->setEnzyme((int) $_POST['enzyme']);
+    }
+    
     $search = new MsgfPlusSearch(MSGF_JAR);
     try {
         $idFile = $search->search($parameters);
@@ -154,6 +162,30 @@ if (empty($fastaFiles)) {
             <option>10 ppm</option>
             <option>15 ppm</option>
             <option>20 ppm</option>
+        </select>
+    </fieldset>
+    <fieldset>
+        <label for="instrument">Instrument</label> <select
+            name="instrument" id="instrument">
+            <option value="0" selected="selected">Low-res LCQ/LTQ</option>
+            <option value="1">Orbitrap/FTICR</option>
+            <option value="2">TOF</option>
+            <option value="3">Q-Exactive</option>
+        </select>
+    </fieldset>
+    <fieldset>
+        <label for="enzyme">Enzyme</label> <select name="enzyme"
+            id="enzyme">
+            <option value="0">Unspecific Cleavage</option>
+            <option value="1" selected="selected">Trypsin</option>
+            <option value="2">Chymotrypsin</option>
+            <option value="3">Lys-C</option>
+            <option value="4">Lys-N</option>
+            <option value="5">Glutamyl endopeptidase</option>
+            <option value="6">Arg-C</option>
+            <option value="7">Arg-N</option>
+            <option value="8">alphaLP</option>
+            <option value="9">No cleavage</option>
         </select>
     </fieldset>
     <fieldset>

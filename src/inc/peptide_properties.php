@@ -125,14 +125,13 @@ foreach ($sequences as $sequence) {
     echo '<h3>' . wordwrap($peptide->getSequence(), 64, '<br />', true) . '</h3>';
     echo 'Length: ' . $peptide->getLength() . '<br />';
     echo 'Mass: ' . number_format($peptide->getMonoisotopicMass(), 4) . 'Da<br />';
-    echo 'Mass/Charge: ' . number_format($peptide->getMonoisotopicMassCharge($charge), 4) . 'Da<br />';
     echo 'Formula: ' . preg_replace('/([0-9]+)/', '<sub>$1</sub>', $peptide->getMolecularFormula()) . '<br /><br />';
     
     if ($fragmentMethod == 'All') {
         $frags = array();
         $frags['A'] = new AFragment($peptide);
         $frags['B'] = new BFragment($peptide);
-        $frags['C'] = new CFragment($peptide);        
+        $frags['C'] = new CFragment($peptide);
         
         $frags['X'] = new XFragment($peptide);
         $frags['Y'] = new YFragment($peptide);
@@ -141,6 +140,25 @@ foreach ($sequences as $sequence) {
         $frags = FragmentFactory::getMethodFragments($fragmentMethod, $peptide);
     }
     ?>
+<h4>Mass/Charge</h4>
+
+<table class="formattedTable hoverableRow centreTable" style="width: 25em;">
+    <thead>
+        <tr>
+            <th>Charge State</th>
+            <th>Mass</th>
+        </tr>
+    </thead>
+    <tbody>
+    <?php
+    for ($chargeIndex = 1; $chargeIndex <= 5; $chargeIndex ++) {
+        echo '<tr><td>' . $chargeIndex . '+</td>';
+        echo '<td>' . number_format($peptide->getMonoisotopicMassCharge($chargeIndex), 4) . '</td></tr>';
+    }
+    ?>
+    </tbody>
+</table>
+
 <h4>Fragments</h4>
 
 <table class="formattedTable hoverableRow">
@@ -174,6 +192,7 @@ foreach ($sequences as $sequence) {
             $sequenceIndex = $i;
             if ($fragger->isReversed()) {
                 $sequenceIndex = $peptide->getLength() - ($i - 1);
+                $ionIndex = $peptide->getLength() - ($i - 1);
             }
             
             $ion = '&empty;';

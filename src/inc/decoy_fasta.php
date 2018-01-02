@@ -38,7 +38,7 @@ if (! empty($_FILES) && $_FILES[FORM_FILE]['error'] != 0) {
     die('<p>An error occured. Ensure you included a file to upload.</p>');
 }
 ?>
-<p>This panel will generate a decoy database for the uploaded FASTA file
+<p>This tool will generate a decoy database for the uploaded FASTA file
     by reversing each protein. The output will contain both the uploaded
     data and the decoy database.</p>
 <form enctype="multipart/form-data"

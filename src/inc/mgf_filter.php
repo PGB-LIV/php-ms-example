@@ -112,19 +112,19 @@ if (! empty($_FILES) && $_FILES[FORM_FILE]['error'] != 0) {
         <label for="minRt">Min RT</label>
         
         <input type="text" name="rt_min"
-            id="minRt">
+            id="minRt"> seconds
     </fieldset>
     <fieldset>
         <label for="maxRt">Max RT</label><input type="text" name="rt_max"
-            id="maxRt">
+            id="maxRt"> seconds
     </fieldset>
     <fieldset>
         <label for="minMass">Min Mass</label><input type="text" name="mass_min"
-            id="minMass">
+            id="minMass"> Da
     </fieldset>
     <fieldset>
         <label for="maxMass">Max Mass</label><input type="text" name="mass_max"
-            id="maxMass">
+            id="maxMass"> Da
     </fieldset>
 
     <input type="submit" value="Upload MGF" />
