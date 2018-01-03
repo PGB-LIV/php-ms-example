@@ -80,11 +80,14 @@ if (! empty($_FILES) && $_FILES[FORM_IDENT]['error'] == 0 && $_FILES[FORM_RAW]['
     $spectraLookup = array();
     
     $raw = new MgfReader($_FILES[FORM_RAW]['tmp_name']);
+    $count = 0;
     foreach ($raw as $spectra) {
-        $spectraLookup[$spectra->getTitle()] = $spectra;
+        $spectraLookup['index=' . $count] = $spectra;
+        $count ++;
     }
     
     $mzidentml = MzIdentMlReaderFactory::getReader($mzIdentMlFile);
+    
     $noIdentTitle = false;
     foreach ($mzidentml->getAnalysisData() as $spectra) {
         foreach ($spectra->getIdentifications() as $identification) {
@@ -92,17 +95,12 @@ if (! empty($_FILES) && $_FILES[FORM_IDENT]['error'] == 0 && $_FILES[FORM_RAW]['
                 str_replace('X', '', $identification->getPeptide()
                     ->getSequence()));
             
-            if (is_null($spectra->getTitle())) {
-                $noIdentTitle = true;
+            if (! isset($spectraLookup[$spectra->getIdentifier()])) {
                 continue;
             }
             
-            $spectraLookup[$spectra->getTitle()]->addIdentification($identification);
+            $spectraLookup[$spectra->getIdentifier()]->addIdentification($identification);
         }
-    }
-    
-    if ($noIdentTitle) {
-        echo '<p>One or more of your identifications does not contain the spectrum title (MS:1000796) element, without this CV param we are unable to map your identifications to your MGF file. The affected records were not processed.</p>';
     }
     
     $protocolCollection = $mzidentml->getAnalysisProtocolCollection();
