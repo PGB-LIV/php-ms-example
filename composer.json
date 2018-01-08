@@ -16,7 +16,7 @@
 	],
 	"require" : {
 		"php" : ">=5.4.0",
-		"pgb-liv/php-ms" : "1.*"
+		"pgb-liv/php-ms" : "dev-master"
 	},
 	"require-dev" : {
 		"theseer/phpdox" : "0.8.*",
