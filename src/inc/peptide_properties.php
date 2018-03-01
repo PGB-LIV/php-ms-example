@@ -27,8 +27,8 @@ if (isset($_REQUEST['modificationMass'])) {
     $modificationMass = $_REQUEST['modificationMass'];
 }
 
-$modificationPositions = explode("\n", trim($modificationPosition));
-$modificationMasses = explode("\n", trim($modificationMass));
+$modificationPositions = explode("\n", $modificationPosition);
+$modificationMasses = explode("\n", $modificationMass);
 
 $modifications = array();
 for ($i = 0; $i < count($modificationPositions); $i ++) {
@@ -57,7 +57,6 @@ for ($i = 0; $i < count($modificationPositions); $i ++) {
 
 <p>Generates the fragment ions for a specified peptide. You can generate for multiple peptides by seperating each peptide with a new line.</p>
 <p>Modifications can be input using either a location or a residue, and a mass. Each modification should be seperated by a new line. Use [ and ] for N and C terminus.</p>
-
 <form method="get" action="#">
     <input type="hidden" name="page" value="peptide_properties" />
     <fieldset>
@@ -94,16 +93,14 @@ for ($i = 0; $i < count($modificationPositions); $i ++) {
 foreach ($sequences as $sequence) {
     $peptide = new Peptide(trim($sequence));
     
-    echo '<h3>' . $peptide->getSequence() . '</h3>';
-    echo 'Length: ' . $peptide->getLength() . '<br />';
-    echo 'Mass: ' . $peptide->getMass() . 'Da<br />';
-    echo 'Formula: ' . preg_replace('/([0-9]+)/', '<sub>$1</sub>', $peptide->getMolecularFormula()) . '<br />';
-        
     foreach ($modifications as $modification) {
         $peptide->addModification($modification);
     }
     
-    echo 'Mass (inc. modifications): ' . $peptide->getMass() . 'Da<br /><br />';
+    echo '<h3>' . $peptide->getSequence() . '</h3>';
+    echo 'Length: ' . $peptide->getLength() . '<br />';
+    echo 'Mass: ' . $peptide->getMass() . 'Da<br />';
+    echo 'Formula: ' . preg_replace('/([0-9]+)/', '<sub>$1</sub>', $peptide->getMolecularFormula()) . '<br /><br />';
     
     $frags = array();
     $frags['B Ions'] = new BFragment($peptide);
