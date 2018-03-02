@@ -10,6 +10,7 @@ html {
 html {
     -ms-text-size-adjust: 100%;
     -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
 }
 
 body {
@@ -36,6 +37,7 @@ progress {
 a {
     background-color: transparent;
     -webkit-text-decoration-skip: objects;
+    text-decoration-skip: objects;
 }
 
 a:active, a:hover {
@@ -69,11 +71,11 @@ sub, sup {
 }
 
 sub {
-    bottom: -0.25em;
+    bottom: -.25em;
 }
 
 sup {
-    top: -0.5em;
+    top: -.5em;
 }
 
 figure {
@@ -83,6 +85,7 @@ figure {
 img {
     border-style: none;
 }
+
 code, kbd, pre, samp {
     font-family: monospace, monospace;
     font-size: 1em;
@@ -111,21 +114,6 @@ button, select {
     text-transform: none;
 }
 
-button, html [type=button], [type=reset], [type=submit] {
-    -webkit-appearance: button;
-}
-
-button::-moz-focus-inner, [type=button]::-moz-focus-inner, [type=reset]::-moz-focus-inner,
-    [type=submit]::-moz-focus-inner {
-    border-style: none;
-    padding: 0;
-}
-
-button:-moz-focusring, [type=button]:-moz-focusring, [type=reset]:-moz-focusring,
-    [type=submit]:-moz-focusring {
-    outline: 1px dotted ButtonText;
-}
-
 fieldset {
     border: 1px solid #c0c0c0;
     margin: 0 2px;
@@ -150,7 +138,7 @@ textarea {
 
 /* End extract */
 html, body {
-    font-family: Verdana, sans-serif;
+    font-family: 'Verdana', sans-serif;
     font-size: 15px;
     line-height: 1.5;
 }
@@ -184,7 +172,7 @@ h6 {
 }
 
 h1, h2, h3, h4, h5, h6 {
-    font-family: "Segoe UI", Arial, sans-serif;
+    font-family: 'Segoe UI', 'Arial', sans-serif;
     font-weight: 400;
     margin: 10px 0;
 }
@@ -205,35 +193,34 @@ a {
 
 footer {
     padding: .01em 16px;
-    color: #fff !important;
-    background-color: #57a639 !important;
-    text-align: center !important;
-    margin-top: 16px !important;
+    color: #fff;
+    background-color: #57a639;
+    text-align: center;
+    margin-top: 16px;
 }
 
 footer:before, footer:after {
-    content: "";
+    content: '';
     display: table;
     clear: both;
 }
 
 body {
-    color: #000 !important;
-    background-color: #f1f1f1 !important;
+    color: #000;
+    background-color: #f1f1f1;
 }
 
 #pagecontainer {
     max-width: 90%;
     margin: auto;
-    margin-top: 16px !important;
+    margin-top: 16px;
 }
 
 #navigation {
-    margin: 0;
-    color: #000 !important;
-    background-color: #fff !important;
-    color: #757575 !important;
-    box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.2), 0 4px 20px 0
+    box-sizing: border-box;
+    background-color: #fff;
+    color: #757575;
+    box-shadow: 0 4px 10px 0 rgba(0, 0, 0, .2), 0 4px 20px 0
         rgba(0, 0, 0, .19);
     padding: 1em .5em 2em 4em;
     display: block;
@@ -241,6 +228,7 @@ body {
     width: 24.99999%;
     max-width: 300px;
     list-style-type: none;
+    margin: 0;
 }
 
 #navigation>li {
@@ -248,7 +236,7 @@ body {
 }
 
 #navigation:before, #navigation:after, .panel:before, .panel:after {
-    content: "";
+    content: '';
     display: table;
     clear: both;
 }
@@ -257,19 +245,19 @@ body {
     padding: .2em 1em 5em 1em;
     box-shadow: 0 2px 5px 0 rgba(0, 0, 0, .16), 0 2px 10px 0
         rgba(0, 0, 0, .12);
-    color: #000 !important;
-    background-color: #fff !important;
-    margin-bottom: 16px !important;
+    color: #000;
+    background-color: #fff;
+    margin-bottom: 16px;
 }
 
 h2 {
-    color: #757575 !important;
-    padding-top: 16px !important;
-    padding-bottom: 16px !important;
+    color: #757575;
+    padding-top: 16px;
+    padding-bottom: 16px;
 }
 
 #grid:after, #grid:before {
-    content: "";
+    content: '';
     display: table;
     clear: both;
 }
@@ -336,7 +324,7 @@ h2 {
 }
 
 form {
-    width: 80%; 
+    width: 80%;
     margin-left: auto;
     margin-right: auto;
 }
@@ -351,23 +339,24 @@ form label:after {
 }
 
 form input, form select {
+    box-sizing: border-box;
     margin: 0;
     padding: 4px;
     width: 200px;
     color: #57a639;
 }
 
-form input[type="text"] {
+form input[type='text'] {
     border: 1px solid #ccc;
 }
 
 input[type='checkbox'] {
-	width: 25px;
-	margin: 10px 100px;
-	position: relative;
+    width: 25px;
+    margin: 10px 100px;
+    position: relative;
 }
 
-form input[type="submit"] {
+form input[type='submit'] {
     display: block;
     margin-left: 20%;
     margin-right: auto;
@@ -382,6 +371,15 @@ form fieldset {
     border: 0;
 }
 
-input.smallInput {
+.smallInput, .width50px {
     width: 50px;
+}
+
+.decoy, .decoy td {
+    background-color: #fff1f1;
+    color: #f00;
+}
+
+.sequence {
+    font-family: monospace;
 }

@@ -15,13 +15,14 @@ use pgb_liv\php_ms\Reader\MgfReader;
     </fieldset>
 </form>
 <?php
-if (isset($_FILES['mgf'])) {
-    
+if (! empty($_FILES) && $_FILES['mgf']['error'] != 0) {
+    die('<p>An error occured. Ensure you included a file to upload.</p>');
+} elseif (! empty($_FILES) && $_FILES['mgf']['error'] == 0) {
     $mgfFile = $_FILES['mgf']['tmp_name'];
     
     $reader = new MgfReader($mgfFile);
     
-    echo '<table class="formattedTable hoverableRow"><thead><tr><th>Title</th><th>m/z</th><th>z</th><th>RT</th><th>Fragments</th></tr></thead><tbody>';
+    echo '<table class="formattedTable hoverableRow"><thead><tr><th>Title</th><th>m/z</th><th>z</th><th><abbr title="Retention Time">RT</abbr> (sec)</th><th>Fragments</th></tr></thead><tbody>';
     
     foreach ($reader as $spectra) {
         echo '<tr><td>';

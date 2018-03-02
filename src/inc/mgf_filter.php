@@ -11,7 +11,7 @@ set_time_limit(3600);
 
 define('FORM_FILE', 'mgf');
 
-if (isset($_FILES[FORM_FILE])) {
+if (! empty($_FILES) && $_FILES[FORM_FILE]['error'] == 0) {
     $filters = array();
     
     if ($_POST['charge_min'] != 'ANY' || $_POST['charge_max'] != 'ANY') {
@@ -64,6 +64,11 @@ if (isset($_FILES[FORM_FILE])) {
 }
 ?>
 <h2>MGF Filter</h2>
+<?php
+if (! empty($_FILES) && $_FILES[FORM_FILE]['error'] != 0) {
+    die('<p>An error occured. Ensure you included a file to upload.</p>');
+}
+?>
 <p>This tool allows you to upload an MGF file and filter it by the specified options. A new MGF file will be generated that you can download.</p>
 
 <form enctype="multipart/form-data"
@@ -107,19 +112,19 @@ if (isset($_FILES[FORM_FILE])) {
         <label for="minRt">Min RT</label>
         
         <input type="text" name="rt_min"
-            id="minRt">
+            id="minRt"> seconds
     </fieldset>
     <fieldset>
         <label for="maxRt">Max RT</label><input type="text" name="rt_max"
-            id="maxRt">
+            id="maxRt"> seconds
     </fieldset>
     <fieldset>
         <label for="minMass">Min Mass</label><input type="text" name="mass_min"
-            id="minMass">
+            id="minMass"> Da
     </fieldset>
     <fieldset>
         <label for="maxMass">Max Mass</label><input type="text" name="mass_max"
-            id="maxMass">
+            id="maxMass"> Da
     </fieldset>
 
     <input type="submit" value="Upload MGF" />

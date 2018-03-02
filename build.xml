@@ -58,6 +58,7 @@
 		<delete dir="${basedir}/build/phpdox" />
 		<delete file="${basedir}/build/composer.lock" />
 		<delete dir="${basedir}/src/vendor" />
+		<delete file="${basedir}/composer.lock" />
 		<property name="clean.done" value="true" />
 	</target>
 
@@ -67,6 +68,13 @@
 		<mkdir dir="${basedir}/build/logs" />
 		<mkdir dir="${basedir}/build/pdepend" />
 		<mkdir dir="${basedir}/build/phpdox" />
+		<mkdir dir="${basedir}/src/conf/fasta" />
+		<get src="http://www.uniprot.org/uniprot/?sort=&amp;desc=&amp;compress=no&amp;query=proteome:UP000000589%20reviewed:yes&amp;fil=&amp;format=fasta&amp;force=yes" 
+			dest="${basedir}/src/conf/fasta/Mus musculus.fasta" />
+		<get src="http://www.uniprot.org/uniprot/?sort=&amp;desc=&amp;compress=no&amp;query=proteome:UP000005640%20reviewed:yes&amp;fil=&amp;format=fasta&amp;force=yes" 
+			dest="${basedir}/src/conf/fasta/Homo sapiens.fasta" />
+		<get src="http://www.uniprot.org/uniprot/?sort=&amp;desc=&amp;compress=no&amp;query=proteome:UP000002311%20reviewed:yes&amp;fil=&amp;format=fasta&amp;force=yes" 
+			dest="${basedir}/src/conf/fasta/Saccharomyces cerevisiae.fasta"  />
 		<exec executable="${composer}" taskname="composer">
 			<arg value="install" />
 		</exec>
@@ -196,7 +204,7 @@
 
 		<property name="phpcpd.done" value="true" />
 	</target>
-	
+
 	<target name="phpdox" unless="phpdox.done" depends="phploc-ci,phpcs-ci,phpmd-ci" description="Generate project documentation using phpDox">
 		<exec executable="${phpdox}" taskname="phpdox">
 			<arg value="-f" />

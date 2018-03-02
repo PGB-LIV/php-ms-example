@@ -1,18 +1,27 @@
 <?php
 use pgb_liv\php_ms\Reader\MzIdentMlReaderFactory;
-use pgb_liv\php_ms\Reader\MzIdentMlReader1r1;
+use pgb_liv\php_ms\Core\Modification;
+use pgb_liv\php_ms\Reader\HupoPsi\PsiVerb;
 
 set_time_limit(600);
 
 define('FORM_FILE', 'mzidentml');
 ?>
-<h2>MzIdentML Viewer</h2>
+<h2>mzIdentML Viewer</h2>
+<?php
+if (! empty($_FILES) && $_FILES[FORM_FILE]['error'] != 0) {
+    die('<p>An error occured. Ensure you included a file to upload.</p>');
+}
+?>
+
+<p>Note, only mzIdentML 1.1 and 1.2 are currently supported.</p>
 
 <form enctype="multipart/form-data" action="?page=mzidentml_viewer"
     method="POST">
     <fieldset>
-        <label for="file">MzIdentML File</label> <input name="<?php echo FORM_FILE; ?>"
-            type="file" id="file" /> (.gz or .mzid supported)
+        <label for="file">mzIdentML File</label> <input
+            name="<?php echo FORM_FILE; ?>" type="file" id="file" />
+        (.gz or .mzid supported)
     </fieldset>
 
     <fieldset>
@@ -21,36 +30,43 @@ define('FORM_FILE', 'mzidentml');
 </form>
 <?php
 
-if (! empty($_FILES)) {
-    $mzIdentMlFile = $_FILES[FORM_FILE]['tmp_name'];
-    
-    if (substr_compare($_FILES[FORM_FILE]['name'], '.gz', strlen($_FILES[FORM_FILE]['name']) - 3, strlen($_FILES[FORM_FILE]['name'])) === 0) {
-        // This input should be from somewhere else, hard-coded in this example
-        $file_name = $_FILES[FORM_FILE]['tmp_name'];
+if ((! empty($_FILES) && $_FILES[FORM_FILE]['error'] == 0) || isset($_GET['search'])) {
+    if (! empty($_FILES)) {
+        $name = $_FILES[FORM_FILE]['name'];
+        $mzIdentMlFile = $_FILES[FORM_FILE]['tmp_name'];
         
-        // Raising this value may increase performance
-        // read 4kb at a time
-        $buffer_size = 4096;
-        $out_file_name = $file_name . '_decom';
-        
-        // Open our files (in binary mode)
-        $file = gzopen($file_name, 'rb');
-        $out_file = fopen($out_file_name, 'wb');
-        
-        // Keep repeating until the end of the input file
-        while (! gzeof($file)) {
-            // Read buffer-size bytes
-            // Both fwrite and gzread and binary-safe
-            fwrite($out_file, gzread($file, $buffer_size));
+        if (substr_compare($_FILES[FORM_FILE]['name'], '.gz', strlen($_FILES[FORM_FILE]['name']) - 3) === 0) {
+            // This input should be from somewhere else, hard-coded in this example
+            $file_name = $_FILES[FORM_FILE]['tmp_name'];
+            
+            // Raising this value may increase performance
+            // read 4kb at a time
+            $buffer_size = 4096;
+            $out_file_name = $file_name . '_decom';
+            
+            // Open our files (in binary mode)
+            $file = gzopen($file_name, 'rb');
+            $out_file = fopen($out_file_name, 'wb');
+            
+            // Keep repeating until the end of the input file
+            while (! gzeof($file)) {
+                // Read buffer-size bytes
+                // Both fwrite and gzread and binary-safe
+                fwrite($out_file, gzread($file, $buffer_size));
+            }
+            
+            // Files are done, close files
+            fclose($out_file);
+            gzclose($file);
+            
+            $mzIdentMlFile = $out_file_name;
         }
-        
-        // Files are done, close files
-        fclose($out_file);
-        gzclose($file);
-        
-        $mzIdentMlFile = $out_file_name;
+    } else {
+        $mzIdentMlFile = sys_get_temp_dir() . '/' . $_GET['search'] . '.mzid';
+        $name = $_GET['name'];
     }
-    echo '<h1>' . $_FILES[FORM_FILE]['name'] . '</h1>';
+    
+    echo '<h3>' . $name . '</h3>';
     
     $reader = MzIdentMlReaderFactory::getReader($mzIdentMlFile);
     ?>
@@ -61,8 +77,8 @@ if (! empty($_FILES)) {
     <li><a href="#proteins">Protein Groups</a></li>
 </ul>
 
-<a name="software" />
-<h2>Software</h2>
+<a id="software"></a>
+<h4>Software</h4>
 <?php
     foreach ($reader->getAnalysisSoftwareList() as $software) {
         echo $software['name'] . ' ';
@@ -74,17 +90,17 @@ if (! empty($_FILES)) {
     }
     ?>
 
-<a name="protocol" />
-<h2>Protocol</h2>
+<a id="protocol"></a>
+<h4>Protocol</h4>
 
 <?php
     $protocolCollection = $reader->getAnalysisProtocolCollection();
     
     if (isset($protocolCollection['spectrum'])) {
-        echo '<h3>Spectrum Protocol</h3>';
+        echo '<h5>Spectrum Protocol</h5>';
         
         foreach ($protocolCollection['spectrum'] as $key => $protocol) {
-            echo '<h4>Software</h4>';
+            echo '<h6>Software</h6>';
             
             echo $protocol['software']['name'] . ' ';
             if (isset($protocol['software']['version'])) {
@@ -93,7 +109,7 @@ if (! empty($_FILES)) {
             
             echo '<br />';
             if (isset($protocol['fragmentTolerance']) || isset($protocol['parentTolerance'])) {
-                echo '<h4>Tolerances</h4>';
+                echo '<h6>Tolerances</h6>';
                 
                 if (isset($protocol['fragmentTolerance'])) {
                     foreach ($protocol['fragmentTolerance'] as $tolerance) {
@@ -109,7 +125,7 @@ if (! empty($_FILES)) {
             }
             
             if (isset($protocol['enzymes'])) {
-                echo '<h4>Enzymes</h4>';
+                echo '<h6>Enzymes</h6>';
                 
                 foreach ($protocol['enzymes'] as $enzyme) {
                     if (isset($enzyme['EnzymeName']['name'])) {
@@ -123,73 +139,126 @@ if (! empty($_FILES)) {
             }
             
             if (isset($protocol['modifications'])) {
-                echo '<h4>Modifications</h4>';
+                echo '<h6>Modifications</h6>';
                 
                 foreach ($protocol['modifications'] as $modification) {
-                    echo '[' . ($modification->isFixed() ? 'F' : 'V') . '] ' . $modification->getName() . ' ' . $modification->getMonoisotopicMass() . ' ' . implode('', $modification->getResidues()) . '<br />';
+                    echo '[' . ($modification->isFixed() ? 'F' : 'V') . '] ' . $modification->getName() . ' (' .
+                         implode(',', $modification->getResidues());
+                    
+                    if ($modification->getPosition() != Modification::POSITION_ANY) {
+                        echo '@' . $modification->getPosition();
+                    }
+                    
+                    echo ') ' . $modification->getMonoisotopicMass() . ' ' . '<br />';
                 }
             }
         }
     }
     if (isset($protocolCollection['protein'])) {
         $protocol = $protocolCollection['protein'];
-        echo '<h3>Protein Protocol</h3>';
-        echo '<h4>Software</h4>';
+        echo '<h5>Protein Protocol</h5>';
+        echo '<h6>Software</h6>';
         
         echo $protocol['software']['name'] . ' ';
         if (isset($protocol['software']['version'])) {
             echo $protocol['software']['version'];
         }
-        echo '<h4>Threshold</h4>';
+        echo '<h6>Threshold</h6>';
         
         foreach ($protocol['threshold'] as $threshold) {
-            echo $threshold[MzIdentMlReader1r1::CV_ACCESSION] . ': ' . $threshold['name'];
+            echo $threshold[PsiVerb::CV_ACCESSION] . ': ' . $threshold['name'];
         }
     }
     ?>
-
-<a name="peptides" />
-<h2>Peptide Spectrum Matches</h2>
+<a id="peptides"></a>
+<h4>Peptide Spectrum Matches</h4>
 <?php
-    foreach ($reader->getAnalysisData() as $spectra) {
-        echo '<h3>' . $spectra->getTitle() . '</h3>';
-        
-        echo '<dl style="float: right;">';
-        echo '<dt>m/z</dt>';
-        echo '<dd>' . number_format($spectra->getMassCharge(), 4) . 'Da</dd>';
-        echo '<dt>Mass</dt>';
-        echo '<dd>' . number_format($spectra->getMass(), 4) . 'Da</dd>';
-        echo '<dt>Charge</dt>';
-        echo '<dd>' . $spectra->getCharge() . '</dd>';
-        echo '</dl>';
-        
-        foreach ($spectra->getIdentifications() as $identification) {
-            echo '<h4 style="margin-left: 1em;">' . $identification->getPeptide()->getSequence() . ' <em>(' . $identification->getPeptide()
-                ->getProtein()
-                ->getAccession() . ')</em></h4>';
+    echo '<table style="font-size:0.75em;" class="formattedTable hoverableRow">';
+    
+    $headerShown = false;
+    $scanTitleEnabled = false;
+    $peptideCount = 0;
+    $decoyCount = 0;
+    $data = $reader->getAnalysisData();
+    ksort($data);
+    foreach ($data as $spectraId => $spectra) {
+        if (! $headerShown) {
+            $scoresHeader = '';
             
-            echo '<dl style="float: left; margin-left: 1em;">';
-            
-            foreach ($identification->getScores() as $scoreName => $scoreValue) {
-                echo '<dt>' . $reader->getCvParamName($scoreName) . '</dt>';
-                echo '<dd>' . $scoreValue . '</dd>';
+            foreach ($spectra->getIdentifications() as $identification) {
+                foreach ($identification->getScores() as $scoreName => $scoreValue) {
+                    $scoresHeader .= '<th>' . $reader->getCvParamName($scoreName) . '</th>';
+                }
+                
+                break;
             }
-            echo '</dl>';
             
-            echo '<ul style="float: left;">';
-            foreach ($identification->getPeptide()->getModifications() as $modification) {
-                echo '<li>@' . $modification->getLocation() . ' ' . $modification->getName() . ' (' . $modification->getMonoisotopicMass() . ')</li>';
+            echo '<thead><tr>';
+            
+            if (! is_null($spectra->getTitle())) {
+                echo '<th>Scan</th>';
+                $scanTitleEnabled = true;
+            } else {
+                echo '<th>ID</th>';
             }
-            echo '</ul>';
+            
+            echo '<th>m/z</th><th>z</th><th>Peptide</th><th>Protein</th><th>Mods</th>' . $scoresHeader .
+                 '</tr></thead><tbody>';
+            
+            $headerShown = true;
         }
         
-        echo '<hr style="clear: both;" />';
+        foreach ($spectra->getIdentifications() as $identification) {
+            if ($identification->getPeptide()->isDecoy()) {
+                echo '<tr class="decoy">';
+                $decoyCount ++;
+            } else {
+                echo '<tr>';
+                $peptideCount ++;
+            }
+            
+            if ($scanTitleEnabled) {
+                echo '<td style="font-weight: bold;">' . wordwrap($spectra->getTitle(), 32, '<br />', true) . '</td>';
+            } else {
+                echo '<td style="font-weight: bold;">' . wordwrap($spectraId, 32, '<br />', true) . '</td>';
+            }
+            
+            echo '<td>' . number_format($spectra->getMassCharge(), 2) . '</td>';
+            echo '<td>' . $spectra->getCharge() . '</td>';
+            
+            echo '<td class="sequence">' . wordwrap($identification->getPeptide()->getSequence(), 16, '<br />', true) .
+                 '</td>';
+            $proteins = $identification->getPeptide()->getProteins();
+            echo '<td>' . $proteins[0]->getProtein()->getAccession() . '</td>';
+            
+            echo '<td>';
+            $mods = array();
+            foreach ($identification->getPeptide()->getModifications() as $modification) {
+                $mods[$modification->getName()][] = $modification->getLocation();
+            }
+            
+            foreach ($mods as $name => $positions) {
+                echo '[' . implode(',', $positions) . ']' . $name . ' ';
+            }
+            echo '</td>';
+            
+            foreach ($identification->getScores() as $scoreName => $scoreValue) {
+                echo '<td>' . $scoreValue . '</td>';
+            }
+            
+            echo '</tr>';
+        }
     }
+    echo '</tbody></table>';
     
     ?>
 
-<a name="proteins" />
-<h2>Protein Groups</h2>
+<p><?php echo $peptideCount; ?> peptide spectrum matches and <span
+        class="decoy"><?php echo $decoyCount?> decoy spectrum matches</span>
+</p>
+
+<a id="proteins"></a>
+<h4>Protein Groups</h4>
 
 <p>Each table shows the protein accession and the associated peptide
     evidence within the group.</p>

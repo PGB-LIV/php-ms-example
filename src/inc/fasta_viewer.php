@@ -6,8 +6,8 @@ use pgb_liv\php_ms\Reader\FastaReader;
 <form enctype="multipart/form-data" action="?page=fasta_viewer"
     method="POST">
     <fieldset>
-        <label for="fasta">FASTA File</label> <input name="fasta" id="fasta"
-            type="file" />
+        <label for="fasta">FASTA File</label> <input name="fasta"
+            id="fasta" type="file" />
     </fieldset>
 
     <fieldset>
@@ -15,8 +15,9 @@ use pgb_liv\php_ms\Reader\FastaReader;
     </fieldset>
 </form>
 <?php
-if (isset($_FILES['fasta'])) {
-    
+if (! empty($_FILES) && $_FILES['fasta']['error'] != 0) {
+    die('<p>An error occured. Ensure you included a file to upload.</p>');
+} elseif (! empty($_FILES) && $_FILES['fasta']['error'] == 0) {
     $fastaFile = $_FILES['fasta']['tmp_name'];
     
     $reader = new FastaReader($fastaFile);
@@ -29,13 +30,24 @@ if (isset($_FILES['fasta'])) {
             $organisms['Unknown Organism'][] = $protein;
         }
     }
-    
+?>
+<ul style="float: right;">
+<?php
+
+foreach (array_keys($organisms) as $name) {
+    echo '<li><a href="#'.($name).'">'.$name.'</a></li>';
+}
+    ?>
+</ul>
+
+<?php    
     foreach ($organisms as $name => $proteins) {
+        echo '<a id="'.($name).'"></a>';
         echo '<h2>' . $name . '</h2>';
-        echo '<table class="formattedTable"><thead><tr><th>Accession</th><th>Entry Name</th><th>Description</th><th>Gene</th><th>Sequence Version</th></tr></thead><tbody>';
+        echo '<table class="formattedTable"><thead><tr><th>Identifier</th><th>Entry Name</th><th>Description</th><th>Gene</th><th>Sequence Version</th></tr></thead><tbody>';
         foreach ($proteins as $protein) {
             echo '<tr><td>';
-            echo $protein->getAccession();
+            echo $protein->getUniqueIdentifier();
             echo '</td><td>';
             echo $protein->getEntryName();
             echo '</td><td>';
@@ -49,8 +61,8 @@ if (isset($_FILES['fasta'])) {
             echo wordwrap($protein->getSequence(), 80, '<br />', true);
             echo '</td></tr>';
         }
+        
+        echo '</tbody></table>';
     }
-    
-    echo '</tbody></table>';
 }
 ?>

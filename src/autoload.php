@@ -17,8 +17,7 @@
  * @param string $class The fully-qualified class name.
  * @return void
  */
-spl_autoload_register(function ($class) {
-    
+spl_autoload_register(function ($class) {    
     // project-specific namespace prefix
     $prefix = 'pgb_liv\\php_ms_example\\';
     
@@ -45,4 +44,3 @@ spl_autoload_register(function ($class) {
         require $file;
     }
 });
-    

@@ -4,9 +4,10 @@ use pgb_liv\php_ms\Reader\FastaReader;
 use pgb_liv\php_ms\Core\Tolerance;
 use pgb_liv\php_ms\Utility\Filter\FilterMass;
 
+set_time_limit(600);
 define('FORM_FILE', 'fasta');
 
-if (isset($_FILES[FORM_FILE])) {
+if (! empty($_FILES) && $_FILES[FORM_FILE]['error'] == 0) {
     header('Content-type: text/plain;');
     header('Content-Disposition: attachment; filename="' . $_FILES[FORM_FILE]['name'] . '.csv"');
     
@@ -31,8 +32,8 @@ if (isset($_FILES[FORM_FILE])) {
     }
     
     foreach ($reader as $protein) {
-        
         $peptides = $digest->digest($protein);
+        
         foreach ($peptides as $peptide) {
             if (! is_null($filter) && ! $filter->isValidPeptide($peptide)) {
                 continue;
@@ -46,15 +47,30 @@ if (isset($_FILES[FORM_FILE])) {
 }
 ?>
 <h2>Protein Digestion</h2>
+<?php
+if (! empty($_FILES) && $_FILES[FORM_FILE]['error'] != 0) {
+    die('<p>An error occured. Ensure you included a file to upload.</p>');
+}
+?>
+<p>This tool allows you to upload a FASTA file and to generate a list of
+    peptides as would be produced by the chosen enzyme. You may filter
+    the peptides to those within a certain mass. The output will be a
+    .csv file.</p>
+<p>
 
-<p>This tool allows you to upload a FASTA file and to generate a list of peptides as would be produced by the chosen enzyme. You may filter the peptides to those within a certain mass. The output will be a .csv file.</p>
-
-<form enctype="multipart/form-data" action="?page=protein_digest&amp;txtonly=1"
-    method="POST">
+    The <abbr title="N-terminal Methionine Excision">NME</abbr> option
+    sets whether NME should be performed. When enabled any methionine at
+    the n-terminus of a protein will be removed. Both the excised and
+    non-excised peptide will be returned after digestion. Note, protein
+    sequence which do not contain a methionine at the n-terminus will be
+    unaffected.
+</p>
+<form enctype="multipart/form-data"
+    action="?page=protein_digest&amp;txtonly=1" method="POST">
 
     <fieldset>
-        <label for="fasta">FASTA File</label> <input name="<?php echo FORM_FILE; ?>"
-            type="file" id="fasta" />
+        <label for="fasta">FASTA File</label> <input
+            name="<?php echo FORM_FILE; ?>" type="file" id="fasta" />
     </fieldset>
 
     <fieldset>
@@ -69,7 +85,7 @@ if (isset($_FILES[FORM_FILE])) {
     </fieldset>
 
     <fieldset>
-        <label for="nme"><abbr title=" N-terminal Methionine Excision">NME</abbr></label><input type="checkbox" name="nme"
+        <label for="nme">N-terminal Methionine Excision</label><input type="checkbox" name="nme"
             id="nme" value="1" />
     </fieldset>
 
@@ -80,7 +96,7 @@ if (isset($_FILES[FORM_FILE])) {
 
     <fieldset>
         <label for="mass">Mass Value</label> <input type="text"
-            name="mass" id="mass" value="" /> &plusmn; <input
+            name="mass" id="mass" value="" /> Da &plusmn; <input
             type="text" name="ppm" id="ppm" value="5" class="smallInput" />
         ppm
     </fieldset>

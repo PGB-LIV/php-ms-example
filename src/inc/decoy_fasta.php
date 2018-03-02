@@ -4,17 +4,15 @@ use pgb_liv\php_ms\Writer\FastaWriter;
 
 define('FORM_FILE', 'fasta');
 
-if (! empty($_FILES)) {
-    if ($_FILES[FORM_FILE]['error'] != 0) {
-        die('Upload Error: ' . $_FILES[FORM_FILE]['error']);
-    }
-    
+if (! empty($_FILES) && $_FILES[FORM_FILE]['error'] == 0) {
     $decoyPrefix = $_POST['prefix'];
     
     $fastaFile = $_FILES[FORM_FILE]['tmp_name'];
     $reader = new FastaReader($fastaFile);
     
+    header('Content-Disposition: attachment; filename="' . $decoyPrefix . $_FILES[FORM_FILE]['name'] . '"');
     header('Content-type: text/plain;');
+    
     $writer = new FastaWriter('php://output');
     foreach ($reader as $entry) {
         // Write non-decoy
@@ -35,18 +33,23 @@ if (! empty($_FILES)) {
 ?>
 <h2>Decoy FASTA</h2>
 
-<p>This panel will generate a decoy database for the uploaded FASTA file
+<?php
+if (! empty($_FILES) && $_FILES[FORM_FILE]['error'] != 0) {
+    die('<p>An error occured. Ensure you included a file to upload.</p>');
+}
+?>
+<p>This tool will generate a decoy database for the uploaded FASTA file
     by reversing each protein. The output will contain both the uploaded
     data and the decoy database.</p>
 <form enctype="multipart/form-data"
     action="?page=decoy_fasta&amp;txtonly=1" method="POST">
     <fieldset>
-        <label for="file">FASTA File</label> <input name="<?php echo FORM_FILE; ?>"
-            type="file" id="file" />
+        <label for="file">FASTA File</label> <input
+            name="<?php echo FORM_FILE; ?>" type="file" id="file" />
     </fieldset>
     <fieldset>
-        <label for="prefix">Decoy Prefix</label> 
-        <input type="text" value="DECOY_" name="prefix" id="prefix" />
+        <label for="prefix">Decoy Prefix</label> <input type="text"
+            value="DECOY_" name="prefix" id="prefix" />
     </fieldset>
     <fieldset>
         <input type="submit" value="Generate Decoys" />
