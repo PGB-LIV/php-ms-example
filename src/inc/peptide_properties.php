@@ -62,8 +62,11 @@ if (isset($_REQUEST['fragmentMethod'])) {
 ?>
 <h2>MS Fragment Ion Generator</h2>
 
-<p>Generates the fragment ions for a specified peptide. You can generate for multiple peptides by seperating each peptide with a new line.</p>
-<p>Modifications can be input using either a location or a residue, and a mass. Each modification should be seperated by a new line. Use [ and ] for N and C terminus.</p>
+<p>Generates the fragment ions for a specified peptide. You can generate
+    for multiple peptides by seperating each peptide with a new line.</p>
+<p>Modifications can be input using either a location or a residue, and
+    a mass. Each modification should be seperated by a new line. Use [
+    and ] for N and C terminus.</p>
 <form method="get" action="#">
     <input type="hidden" name="page" value="peptide_properties" />
     <fieldset>
@@ -139,7 +142,8 @@ foreach ($sequences as $sequence) {
     ?>
 <h4>Mass/Charge</h4>
 
-<table class="formattedTable hoverableRow centreTable" style="width: 25em;">
+<table class="formattedTable hoverableRow centreTable"
+    style="width: 25em;">
     <thead>
         <tr>
             <th>Charge State</th>
@@ -162,18 +166,15 @@ foreach ($sequences as $sequence) {
     <thead>
     <?php
     echo '<tr>';
+    echo '<th>&nbsp;</th>';
+    echo '<th>#</th>';
+    
     foreach ($frags as $type => $fragger) {
         ?>
-            <th colspan="2"><?php echo $type; ?> Ions</th>
+            <th><?php echo $type; ?> Ions</th>
         <?php
     }
-    echo '</tr><tr>';
-    foreach ($frags as $type => $fragger) {
-        ?>
-            <th>#</th>
-        <th>Ion</th>
-        <?php
-    }
+    echo '<th>#</th>';
     echo '</tr>';
     ?>
     </thead>
@@ -181,6 +182,8 @@ foreach ($sequences as $sequence) {
 <?php
     for ($i = 1; $i <= $peptide->getLength(); $i ++) {
         echo '<tr>';
+        echo '<td>' . $sequence[$i - 1] . '</td>';
+        echo '<td>' . $i . '</td>';
         
         foreach ($frags as $type => $fragger) {
             $ions = $fragger->getIons();
@@ -205,9 +208,10 @@ foreach ($sequences as $sequence) {
                 $ion = number_format($ion, 6);
             }
             
-            echo '<td>' . $sequence[$sequenceIndex - 1] . '</td><td>' . $ion . '</td>';
+            echo '<td>' . $ion . '</td>';
         }
         
+        echo '<td>' . ($peptide->getLength() + 1 - $i) . '</td>';
         echo '</tr>';
     }
     ?></tbody>
