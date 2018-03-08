@@ -164,19 +164,18 @@ foreach ($sequences as $sequence) {
 
 <table class="formattedTable hoverableRow">
     <thead>
+        <tr>
+            <th>&nbsp;</th>
+            <th>#</th>
     <?php
-    echo '<tr>';
-    echo '<th>&nbsp;</th>';
-    echo '<th>#</th>';
-    
     foreach ($frags as $type => $fragger) {
         ?>
             <th><?php echo $type; ?> Ions</th>
         <?php
     }
-    echo '<th>#</th>';
-    echo '</tr>';
     ?>
+    <th>#</th>
+        </tr>
     </thead>
     <tbody>
 <?php
