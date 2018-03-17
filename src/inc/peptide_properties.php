@@ -14,7 +14,7 @@ if (isset($_REQUEST['sequence'])) {
     $sequence = $_REQUEST['sequence'];
 }
 
-$sequences = explode("\n", $sequence);
+$sequences = explode("\n", strtoupper($sequence));
 $charge = 1;
 if (isset($_REQUEST['charge'])) {
     $charge = $_REQUEST['charge'];
