@@ -35,8 +35,8 @@ $modificationMasses = explode("\n", $modificationMass);
 
 $modifications = array();
 for ($i = 0; $i < count($modificationPositions); $i ++) {
-    $mass = (float) $modificationMasses[$i];
-    $location = $modificationPositions[$i];
+    $mass = (float) ($modificationMasses[$i]);
+    $location = trim($modificationPositions[$i]);
     
     if (strlen($location) == 0) {
         continue;
@@ -44,6 +44,7 @@ for ($i = 0; $i < count($modificationPositions); $i ++) {
     
     $modification = new Modification();
     $modification->setMonoisotopicMass($mass);
+    
     if (is_numeric($location)) {
         $modification->setLocation((int) $location);
     } else {
@@ -117,14 +118,17 @@ foreach (FragmentFactory::getFragmentMethods() as $method) {
 <?php
 foreach ($sequences as $sequence) {
     $peptide = new Peptide(trim($sequence));
-    
+    $mass = $peptide->getMonoisotopicMass();
     foreach ($modifications as $modification) {
         $peptide->addModification($modification);
     }
     
     echo '<h3>' . wordwrap($peptide->getSequence(), 64, '<br />', true) . '</h3>';
     echo 'Length: ' . $peptide->getLength() . '<br />';
-    echo 'Mass: ' . number_format($peptide->getMonoisotopicMass(), 4) . 'Da<br />';
+    echo 'Mass: ' . number_format($mass, 4) . 'Da<br />';
+    if ($peptide->isModified() > 0) {
+        echo 'Mass (Inc. Modifications): ' . number_format($peptide->getMonoisotopicMass(), 4) . 'Da<br />';
+    }
     echo 'Formula: ' . preg_replace('/([0-9]+)/', '<sub>$1</sub>', $peptide->getMolecularFormula()) . '<br /><br />';
     
     if ($fragmentMethod == 'All') {
