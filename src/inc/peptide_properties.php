@@ -63,8 +63,8 @@ if (isset($_REQUEST['fragmentMethod'])) {
 ?>
 <h2>MS Fragment Ion Generator</h2>
 
-<p>Generates the fragment ions for a specified peptide. You can generate
-    for multiple peptides by seperating each peptide with a new line.</p>
+<p>Generates the fragment ions for a specified sequence. You can generate
+    for multiple sequence by seperating each sequence with a new line.</p>
 <p>Modifications can be input using either a location or a residue, and
     a mass. Each modification should be seperated by a new line. Use [
     and ] for N and C terminus.</p>
@@ -189,7 +189,7 @@ foreach ($sequences as $sequence) {
         echo '<td>' . $i . '</td>';
         
         foreach ($frags as $type => $fragger) {
-            $ions = $fragger->getIons();
+            $ions = $fragger->getIons($charge);
             
             $ionIndex = $i;
             $sequenceIndex = $i;
@@ -201,12 +201,6 @@ foreach ($sequences as $sequence) {
             $ion = '&empty;';
             if (isset($ions[$ionIndex])) {
                 $ion = $ions[$ionIndex];
-                
-                if ($charge > 1) {
-                    $ion -= 1.007276466879;
-                    $ion += 1.007276466879 * $charge;
-                    $ion /= $charge;
-                }
                 
                 $ion = number_format($ion, 6);
             }
