@@ -11,9 +11,15 @@
     via the GitHub "issue tracker"
 </p>
 
+<h3>Publication</h3>
+
+<ul>
+    <li><a href="https://pubs.acs.org/doi/10.1021/acs.jproteome.7b00783">Collins, A. and Jones, A. R. (2018) <strong>phpMs: A PHP-Based Mass Spectrometry Utilities Library</strong>. Journal of Proteome Research, 17 (3). 1309 - 1313.</a></li>
+</ul>
+
 <h3>Developers</h3>
 
 <ul>
     <li>Andrew Collins (lead developer)</li>
-    <li>Andy Jones (project PI)</li>
+    <li>Andy R. Jones (project PI)</li>
 </ul>

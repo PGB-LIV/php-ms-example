@@ -11,18 +11,32 @@ set_time_limit(600);
 if (isset($_GET['file'])) {
     header('Content-type: text/plain;');
     header('Content-Disposition: attachment; filename="' . $_GET['name'] . '"');
-        
-    $tolerance = new Tolerance((float) $_GET['precursor'], Tolerance::PPM);
     
-    $reader = new MgfReader('/tmp/phpms-'.$_GET['file']);
+    $precursorTolerance = new Tolerance((float) $_GET['precursor'], Tolerance::PPM);
+    
+    $fragmentTolerance = null;
+    if (isset($_GET['fragment'])) {
+        $fragmentTolerance = new Tolerance((float) $_GET['fragment'], Tolerance::PPM);
+    }
+    
+    $reader = new MgfReader('/tmp/phpms-' . $_GET['file']);
     $writer = new MgfWriter('php://output');
     
     foreach ($reader as $spectra) {
-        $before = $spectra->getMonoisotopicMass();
+        $beforeMW = $spectra->getMonoisotopicMass();
         
-        $shift = $tolerance->getDaltonDelta($before);        
-        $spectra->setMonoisotopicMass($before - $shift);
-        echo $before .' --- '. $spectra->getMonoisotopicMass() .' --- '. $shift . PHP_EOL;
+        $shift = $precursorTolerance->getDaltonDelta($beforeMW);
+        $spectra->setMonoisotopicMass($beforeMW - $shift);
+        
+        if (! is_null($fragmentTolerance)) {
+            foreach ($spectra->getFragmentIons() as $fragmentIon) {
+                $beforeMW = $fragmentIon->getMonoisotopicMass();
+                
+                $shift = $fragmentTolerance->getDaltonDelta($beforeMW);
+                $fragmentIon->setMonoisotopicMass($beforeMW - $shift);
+            }
+        }
+        
         $writer->write($spectra);
     }
     
@@ -95,16 +109,17 @@ if (substr_compare($_FILES[FORM_IDENT]['name'], '.gz', strlen($_FILES[FORM_IDENT
     gzclose($file);
     
     $mzIdentMlFile = $out_file_name;
-}?>
+}
+?>
 <h3><?php echo $name; ?></h3>
 
 <?php
 $spectraLookup = array();
 
 $mgfName = basename($_FILES[FORM_RAW]['tmp_name']);
-move_uploaded_file($_FILES[FORM_RAW]['tmp_name'], '/tmp/phpms-'.$mgfName);
+move_uploaded_file($_FILES[FORM_RAW]['tmp_name'], '/tmp/phpms-' . $mgfName);
 
-$raw = new MgfReader('/tmp/phpms-'.$mgfName);
+$raw = new MgfReader('/tmp/phpms-' . $mgfName);
 $count = 0;
 foreach ($raw as $spectra) {
     $spectraLookup['index=' . $count] = $spectra;
@@ -116,8 +131,9 @@ $mzidentml = MzIdentMlReaderFactory::getReader($mzIdentMlFile);
 $noIdentTitle = false;
 foreach ($mzidentml->getAnalysisData() as $spectra) {
     foreach ($spectra->getIdentifications() as $identification) {
-        $identification->getPeptide()->setSequence(str_replace('X', '', $identification->getPeptide()
-            ->getSequence()));
+        $identification->getPeptide()->setSequence(
+            str_replace('X', '', $identification->getPeptide()
+                ->getSequence()));
         
         if (! isset($spectraLookup[$spectra->getIdentifier()])) {
             continue;
@@ -163,7 +179,7 @@ foreach ($spectraLookup as $spectra) {
         $yIons = (new YFragment($identification->getSequence()))->getIons();
         $fragIons = array();
         foreach ($spectra->getFragmentIons() as $ion) {
-            $fragIons[] = $ion->getMassCharge();
+            $fragIons[] = $ion->getMonoisotopicMassCharge();
         }
         
         foreach ($fragIons as $fragIon) {
@@ -221,7 +237,8 @@ foreach ($spectraLookup as $spectra) {
         }
         
         $daDelta = $spectra->getMonoisotopicMass() - $identification->getSequence()->getMonoisotopicMass();
-        $ppmDelta = Tolerance::getDifferencePpm($spectra->getMonoisotopicMass(), $identification->getSequence()->getMonoisotopicMass());
+        $ppmDelta = Tolerance::getDifferencePpm($spectra->getMonoisotopicMass(),
+            $identification->getSequence()->getMonoisotopicMass());
         
         $key = '' . round($daDelta, 2);
         if ($key == '-0') {
@@ -364,4 +381,8 @@ $fragmentShift = array_search(max($fragmentPpmDeltas), $fragmentPpmDeltas);
 echo '<p>Your precursor error indicates a ' . $precursorShift . 'ppm shift is occuring.</p>';
 echo '<p>Your fragment error indicates a ' . $fragmentShift . 'ppm shift is occuring.</p>';
 
-echo '<p><a href="?page=mass_error&amp;file=' . $mgfName . '&amp;name=' . $_FILES[FORM_RAW]['name'] . '&amp;precursor=' . $precursorShift . '&amp;txtonly=1">Download adjusted MGF</a></p>';
+echo '<p><a href="?page=mass_error&amp;file=' . $mgfName . '&amp;name=' . $_FILES[FORM_RAW]['name'] . '&amp;precursor=' .
+    $precursorShift . '&amp;txtonly=1">Download adjusted precursor MGF</a></p>';
+echo '<p><a href="?page=mass_error&amp;file=' . $mgfName . '&amp;name=' . $_FILES[FORM_RAW]['name'] . '&amp;precursor=' .
+    $precursorShift . '&amp;fragment=' . $fragmentShift .
+    '&amp;txtonly=1">Download adjusted precursor and fragment MGF</a></p>';
