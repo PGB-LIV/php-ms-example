@@ -5,11 +5,12 @@ use pgb_liv\php_ms\Utility\Fragment\BFragment;
 use pgb_liv\php_ms\Core\Tolerance;
 use pgb_liv\php_ms\Utility\Fragment\YFragment;
 use pgb_liv\php_ms\Writer\MgfWriter;
+use pgb_liv\php_ms\Utility\Sort\IdentificationSort;
 
 set_time_limit(600);
+ini_set('memory_limit', '8G');
 
 if (isset($_GET['file'])) {
-    header('Content-type: text/plain;');
     header('Content-Disposition: attachment; filename="' . $_GET['name'] . '"');
     
     $precursorTolerance = new Tolerance((float) $_GET['precursor'], Tolerance::PPM);
@@ -48,10 +49,12 @@ if (isset($_GET['file'])) {
 define('FORM_IDENT', 'ident');
 define('FORM_RAW', 'raw');
 ?>
-<h2>Mass Error &amp; Tolerance Calibration</h2>
+<h2>Mass Error Correction</h2>
 
 <p>This tool will analyse your search results and raw data to identify
     whether your instrument calibration is misaligned.</p>
+<p>For best results, it is recommend this tool is used on data which has
+    been searched with a 1% false discovery rate.</p>
 <p>Note, only mzIdentML 1.1 and 1.2 are currently supported.</p>
 
 <?php
@@ -174,89 +177,101 @@ foreach ($spectraLookup as $spectra) {
         continue;
     }
     
-    foreach ($spectra->getIdentifications() as $identification) {
-        $bIons = (new BFragment($identification->getSequence()))->getIons();
-        $yIons = (new YFragment($identification->getSequence()))->getIons();
-        $fragIons = array();
-        foreach ($spectra->getFragmentIons() as $ion) {
-            $fragIons[] = $ion->getMonoisotopicMassCharge();
-        }
-        
-        foreach ($fragIons as $fragIon) {
-            foreach ($bIons as $bIndex => $bIon) {
-                if ($fragmentTolerance->isTolerable($fragIon, $bIon)) {
-                    $daDelta = $fragIon - $bIon;
-                    $ppmDelta = Tolerance::getDifferencePpm($fragIon, $bIon);
-                    
-                    $key = '' . round($daDelta, 2);
-                    if ($key == '-0') {
-                        $key = '0';
-                    }
-                    
-                    if (! isset($fragmentDaDeltas[$key])) {
-                        $fragmentDaDeltas[$key] = 0;
-                    }
-                    
-                    $fragmentDaDeltas[$key] ++;
-                    
-                    $key = '' . round($ppmDelta, 1);
-                    if (! isset($fragmentPpmDeltas[$key])) {
-                        $fragmentPpmDeltas[$key] = 0;
-                    }
-                    
-                    $fragmentPpmDeltas[$key] ++;
-                }
-            }
-        }
-        
-        foreach ($fragIons as $fragIon) {
-            foreach ($yIons as $index => $yIon) {
-                if ($fragmentTolerance->isTolerable($fragIon, $yIon)) {
-                    $daDelta = $fragIon - $yIon;
-                    $ppmDelta = Tolerance::getDifferencePpm($fragIon, $yIon);
-                    
-                    $key = '' . round($daDelta, 2);
-                    if ($key == '-0') {
-                        $key = '0';
-                    }
-                    
-                    if (! isset($fragmentDaDeltas[$key])) {
-                        $fragmentDaDeltas[$key] = 0;
-                    }
-                    
-                    $fragmentDaDeltas[$key] ++;
-                    
-                    $key = '' . round($ppmDelta, 1);
-                    if (! isset($fragmentPpmDeltas[$key])) {
-                        $fragmentPpmDeltas[$key] = 0;
-                    }
-                    
-                    $fragmentPpmDeltas[$key] ++;
-                }
-            }
-        }
-        
-        $daDelta = $spectra->getMonoisotopicMass() - $identification->getSequence()->getMonoisotopicMass();
-        $ppmDelta = Tolerance::getDifferencePpm($spectra->getMonoisotopicMass(),
-            $identification->getSequence()->getMonoisotopicMass());
-        
-        $key = '' . round($daDelta, 2);
-        if ($key == '-0') {
-            $key = '0';
-        }
-        
-        if (! isset($daDeltas[$key])) {
-            $daDeltas[$key] = 0;
-        }
-        
-        $daDeltas[$key] ++;
-        $key = '' . round($ppmDelta, 1);
-        if (! isset($ppmDeltas[$key])) {
-            $ppmDeltas[$key] = 0;
-        }
-        
-        $ppmDeltas[$key] ++;
+    $sort = new IdentificationSort(IdentificationSort::SORT_RANK, SORT_ASC);
+    $idents = $spectra->getIdentifications();
+    $sort->sort($idents, false);
+    
+    $identification = $idents[0];
+    
+    if ($identification->getSequence()->isDecoy()) {
+        continue;
     }
+    
+    if ($identification->getSequence()->isModified()) {
+        continue;
+    }
+    
+    $bIons = (new BFragment($identification->getSequence()))->getIons();
+    $yIons = (new YFragment($identification->getSequence()))->getIons();
+    $fragIons = array();
+    foreach ($spectra->getFragmentIons() as $ion) {
+        $fragIons[] = $ion->getMonoisotopicMassCharge();
+    }
+    
+    foreach ($fragIons as $fragIon) {
+        foreach ($bIons as $bIndex => $bIon) {
+            if ($fragmentTolerance->isTolerable($fragIon, $bIon)) {
+                $daDelta = $fragIon - $bIon;
+                $ppmDelta = Tolerance::getDifferencePpm($fragIon, $bIon);
+                
+                $key = '' . round($daDelta, 2);
+                if ($key == '-0') {
+                    $key = '0';
+                }
+                
+                if (! isset($fragmentDaDeltas[$key])) {
+                    $fragmentDaDeltas[$key] = 0;
+                }
+                
+                $fragmentDaDeltas[$key] ++;
+                
+                $key = '' . round($ppmDelta, 1);
+                if (! isset($fragmentPpmDeltas[$key])) {
+                    $fragmentPpmDeltas[$key] = 0;
+                }
+                
+                $fragmentPpmDeltas[$key] ++;
+            }
+        }
+    }
+    
+    foreach ($fragIons as $fragIon) {
+        foreach ($yIons as $index => $yIon) {
+            if ($fragmentTolerance->isTolerable($fragIon, $yIon)) {
+                $daDelta = $fragIon - $yIon;
+                $ppmDelta = Tolerance::getDifferencePpm($fragIon, $yIon);
+                
+                $key = '' . round($daDelta, 2);
+                if ($key == '-0') {
+                    $key = '0';
+                }
+                
+                if (! isset($fragmentDaDeltas[$key])) {
+                    $fragmentDaDeltas[$key] = 0;
+                }
+                
+                $fragmentDaDeltas[$key] ++;
+                
+                $key = '' . round($ppmDelta, 1);
+                if (! isset($fragmentPpmDeltas[$key])) {
+                    $fragmentPpmDeltas[$key] = 0;
+                }
+                
+                $fragmentPpmDeltas[$key] ++;
+            }
+        }
+    }
+    
+    $daDelta = $spectra->getMonoisotopicMass() - $identification->getSequence()->getMonoisotopicMass();
+    $ppmDelta = Tolerance::getDifferencePpm($spectra->getMonoisotopicMass(),
+        $identification->getSequence()->getMonoisotopicMass());
+    
+    $key = '' . round($daDelta, 2);
+    if ($key == '-0') {
+        $key = '0';
+    }
+    
+    if (! isset($daDeltas[$key])) {
+        $daDeltas[$key] = 0;
+    }
+    
+    $daDeltas[$key] ++;
+    $key = '' . round($ppmDelta, 1);
+    if (! isset($ppmDeltas[$key])) {
+        $ppmDeltas[$key] = 0;
+    }
+    
+    $ppmDeltas[$key] ++;
 }
 
 ksort($daDeltas, SORT_NUMERIC);
@@ -276,11 +291,22 @@ $fragmentShift = array_search(max($fragmentPpmDeltas), $fragmentPpmDeltas);
       google.charts.setOnLoadCallback(fragmentPlots);
       
       function precursorPlots() {
-        var data = google.visualization.arrayToDataTable([
-            ['Daltons', 'Frequency']
+          var data = new google.visualization.DataTable();
+          data.addColumn('number', 'Daltons');
+          data.addColumn('number', 'Frequency');
+          data.addRows([
             <?php
+            $isFirst = true;
             foreach ($daDeltas as $da => $freq) {
-                echo ',[\'' . $da . '\', ' . $freq . ']';
+                if (! $isFirst) {
+                    echo ',';
+                }
+                
+                echo '[' . $da . ', ' . $freq . ']';
+                
+                if ($isFirst) {
+                    $isFirst = false;
+                }
             }
             ?>
           ]);
@@ -293,14 +319,22 @@ $fragmentShift = array_search(max($fragmentPpmDeltas), $fragmentPpmDeltas);
         var chart = new google.visualization.ColumnChart(document.getElementById('precursorDa'));
         chart.draw(data, options);
 
-        var data = google.visualization.arrayToDataTable([
-            ['ppm', 'Frequency']
+        var data = new google.visualization.DataTable();
+        data.addColumn('number', 'Daltons');
+        data.addColumn('number', 'Frequency');
+        data.addRows([
             <?php
+            $isFirst = true;
             foreach ($ppmDeltas as $ppm => $freq) {
-                if ($ppm > $precursorShift + 15 || $ppm < $precursorShift - 15) {
-                    continue;
+                if (! $isFirst) {
+                    echo ',';
                 }
-                echo ',[\'' . $ppm . '\', ' . $freq . ']';
+                
+                echo '[' . $ppm . ', ' . $freq . ']';
+                
+                if ($isFirst) {
+                    $isFirst = false;
+                }
             }
             ?>
           ]);
@@ -315,11 +349,22 @@ $fragmentShift = array_search(max($fragmentPpmDeltas), $fragmentPpmDeltas);
       }
       
       function fragmentPlots() {
-        var data = google.visualization.arrayToDataTable([
-            ['Daltons', 'Frequency']
+        var data = new google.visualization.DataTable();
+        data.addColumn('number', 'Daltons');
+        data.addColumn('number', 'Frequency');
+        data.addRows([
             <?php
+            $isFirst = true;
             foreach ($fragmentDaDeltas as $da => $freq) {
-                echo ',[\'' . $da . '\', ' . $freq . ']';
+                if (! $isFirst) {
+                    echo ',';
+                }
+                
+                echo '[' . $da . ', ' . $freq . ']';
+                
+                if ($isFirst) {
+                    $isFirst = false;
+                }
             }
             ?>
           ]);
@@ -332,15 +377,22 @@ $fragmentShift = array_search(max($fragmentPpmDeltas), $fragmentPpmDeltas);
         var chart = new google.visualization.ColumnChart(document.getElementById('fragmentDa'));
         chart.draw(data, options);
 
-        var data = google.visualization.arrayToDataTable([
-            ['ppm', 'Frequency']
+        var data = new google.visualization.DataTable();
+        data.addColumn('number', 'Daltons');
+        data.addColumn('number', 'Frequency');
+        data.addRows([
             <?php
+            $isFirst = true;
             foreach ($fragmentPpmDeltas as $ppm => $freq) {
-                if ($ppm > $precursorShift + 15 || $ppm < $precursorShift - 15) {
-                    continue;
+                if (! $isFirst) {
+                    echo ',';
                 }
                 
-                echo ',[\'' . $ppm . '\', ' . $freq . ']';
+                echo '[' . $ppm . ', ' . $freq . ']';
+                
+                if ($isFirst) {
+                    $isFirst = false;
+                }
             }
             ?>
           ]);
@@ -378,8 +430,8 @@ $fragmentShift = array_search(max($fragmentPpmDeltas), $fragmentPpmDeltas);
 <h3>Recommendations</h3>
 
 <?php
-echo '<p>Your precursor error indicates a ' . $precursorShift . 'ppm shift is occuring.</p>';
-echo '<p>Your fragment error indicates a ' . $fragmentShift . 'ppm shift is occuring.</p>';
+echo '<p>Your precursor error indicates a ' . $precursorShift . 'ppm shift is occurring.</p>';
+echo '<p>Your fragment error indicates a ' . $fragmentShift . 'ppm shift is occurring.</p>';
 
 echo '<p><a href="?page=mass_error&amp;file=' . $mgfName . '&amp;name=' . $_FILES[FORM_RAW]['name'] . '&amp;precursor=' .
     $precursorShift . '&amp;txtonly=1">Download adjusted precursor MGF</a></p>';
