@@ -223,7 +223,7 @@ if ((! empty($_FILES) && $_FILES[FORM_FILE]['error'] == 0) || isset($_GET['searc
                 echo '<td style="font-weight: bold;">' . wordwrap($spectraId, 32, '<br />', true) . '</td>';
             }
             
-            echo '<td>' . number_format($spectra->getMassCharge(), 2) . '</td>';
+            echo '<td>' . number_format($spectra->getMonoisotopicMassCharge(), 2) . '</td>';
             echo '<td>' . $spectra->getCharge() . '</td>';
             
             echo '<td class="sequence">' . wordwrap($identification->getPeptide()->getSequence(), 16, '<br />', true) .
