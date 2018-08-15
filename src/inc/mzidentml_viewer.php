@@ -99,7 +99,7 @@ if ((! empty($_FILES) && $_FILES[FORM_FILE]['error'] == 0) || isset($_GET['searc
     if (isset($protocolCollection['spectrum'])) {
         echo '<h5>Spectrum Protocol</h5>';
         
-        foreach ($protocolCollection['spectrum'] as $key => $protocol) {
+        foreach ($protocolCollection['spectrum'] as $protocol) {
             echo '<h6>Software</h6>';
             
             echo $protocol['software']['name'] . ' ';
