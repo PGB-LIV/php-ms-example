@@ -28,7 +28,7 @@ if (! empty($_FILES) && $_FILES['mgf']['error'] != 0) {
         echo '<tr><td>';
         echo $spectra->getTitle();
         echo '</td><td>';
-        echo round($spectra->getMassCharge(), 4);
+        echo round($spectra->getMonoisotopicMassCharge(), 4);
         echo '</td><td>';
         echo $spectra->getCharge();
         echo '</td><td>';
