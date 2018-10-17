@@ -88,7 +88,6 @@ if (! empty($_FILES) && $_FILES[FORM_IDENT]['error'] == 0 && $_FILES[FORM_RAW]['
     
     $mzidentml = MzIdentMlReaderFactory::getReader($mzIdentMlFile);
     
-    $noIdentTitle = false;
     foreach ($mzidentml->getAnalysisData() as $spectra) {
         foreach ($spectra->getIdentifications() as $identification) {
             $identification->getPeptide()->setSequence(
@@ -133,11 +132,11 @@ if (! empty($_FILES) && $_FILES[FORM_IDENT]['error'] == 0 && $_FILES[FORM_RAW]['
         }
         
         foreach ($spectra->getIdentifications() as $identification) {
-            $bIons = (new BFragment($identification->getPeptide()))->getIons();
-            $yIons = (new YFragment($identification->getPeptide()))->getIons();
+            $bIons = (new BFragment($identification->getSequence()))->getIons();
+            $yIons = (new YFragment($identification->getSequence()))->getIons();
             $fragIons = array();
             foreach ($spectra->getFragmentIons() as $ion) {
-                $fragIons[] = $ion->getMassCharge();
+                $fragIons[] = $ion->getMonoisotopicMassCharge();
             }
             
             $bMatches = array();
