@@ -20,8 +20,8 @@ if (isset($_REQUEST['charge'])) {
     $charge = $_REQUEST['charge'];
 }
 
-$modificationPosition = 'T';
-$modificationMass = '79.97';
+$modificationPosition = '4';
+$modificationMass = '79.966331';
 if (isset($_REQUEST['modificationPosition'])) {
     $modificationPosition = $_REQUEST['modificationPosition'];
 }
@@ -133,13 +133,13 @@ foreach ($sequences as $sequence) {
     
     if ($fragmentMethod == 'All') {
         $frags = array();
-        $frags['A'] = new AFragment($peptide);
-        $frags['B'] = new BFragment($peptide);
-        $frags['C'] = new CFragment($peptide);
+        $frags['a'] = new AFragment($peptide);
+        $frags['b'] = new BFragment($peptide);
+        $frags['c'] = new CFragment($peptide);
         
-        $frags['X'] = new XFragment($peptide);
-        $frags['Y'] = new YFragment($peptide);
-        $frags['Z'] = new ZFragment($peptide);
+        $frags['x'] = new XFragment($peptide);
+        $frags['y'] = new YFragment($peptide);
+        $frags['z'] = new ZFragment($peptide);
     } else {
         $frags = FragmentFactory::getMethodFragments($fragmentMethod, $peptide);
     }
