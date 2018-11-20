@@ -38,5 +38,5 @@
 	"config" : {
 		"vendor-dir" : "src/vendor"
 	},
-	"minimum-stability" : "stable"
+	"minimum-stability" : "dev"
 }
