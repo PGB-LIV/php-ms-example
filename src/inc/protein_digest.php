@@ -39,7 +39,7 @@ if (! empty($_FILES) && $_FILES[FORM_FILE]['error'] == 0) {
                 continue;
             }
             
-            echo $protein->getUniqueIdentifier() . ',' . $peptide->getSequence() . ',' . $peptide->getMass() . "\n";
+            echo $protein->getIdentifier() . ',' . $peptide->getSequence() . ',' . $peptide->getMass() . "\n";
         }
     }
     

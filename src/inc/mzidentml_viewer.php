@@ -209,7 +209,7 @@ if ((! empty($_FILES) && $_FILES[FORM_FILE]['error'] == 0) || isset($_GET['searc
         }
         
         foreach ($spectra->getIdentifications() as $identification) {
-            if ($identification->getPeptide()->isDecoy()) {
+            if ($identification->getSequence()->isDecoy()) {
                 echo '<tr class="decoy">';
                 $decoyCount ++;
             } else {
@@ -228,12 +228,12 @@ if ((! empty($_FILES) && $_FILES[FORM_FILE]['error'] == 0) || isset($_GET['searc
             
             echo '<td class="sequence">' . wordwrap($identification->getPeptide()->getSequence(), 16, '<br />', true) .
                  '</td>';
-            $proteins = $identification->getPeptide()->getProteins();
-            echo '<td>' . $proteins[0]->getProtein()->getAccession() . '</td>';
+            $proteins = $identification->getSequence()->getProteins();
+            echo '<td>' . $proteins[0]->getProtein()->getDatabaseEntries()[0]->getUniqueIdentifier() . '</td>';
             
             echo '<td>';
             $mods = array();
-            foreach ($identification->getPeptide()->getModifications() as $modification) {
+            foreach ($identification->getSequence()->getModifications() as $modification) {
                 $mods[$modification->getName()][] = $modification->getLocation();
             }
             

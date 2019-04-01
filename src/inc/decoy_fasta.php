@@ -1,33 +1,56 @@
 <?php
 use pgb_liv\php_ms\Reader\FastaReader;
 use pgb_liv\php_ms\Writer\FastaWriter;
+use pgb_liv\php_ms\Core\Entry\DatabaseEntry;
+use pgb_liv\php_ms\Reader\FastaEntry\PeffFastaEntry;
+use pgb_liv\php_ms\Core\Database\DefaultDatabase;
 
 define('FORM_FILE', 'fasta');
 
 if (! empty($_FILES) && $_FILES[FORM_FILE]['error'] == 0) {
     $decoyPrefix = $_POST['prefix'];
-    
+
     $fastaFile = $_FILES[FORM_FILE]['tmp_name'];
     $reader = new FastaReader($fastaFile);
-    
+
     header('Content-Disposition: attachment; filename="' . $decoyPrefix . $_FILES[FORM_FILE]['name'] . '"');
     header('Content-type: text/plain;');
-    
-    $writer = new FastaWriter('php://output');
-    foreach ($reader as $entry) {
+
+    $writer = new FastaWriter('php://output', new PeffFastaEntry());
+
+    $databases = array();
+
+    foreach ($reader as $protein) {
         // Write non-decoy
-        $writer->write($entry);
-        
-        // Create decoy
-        $entry->setUniqueIdentifier($decoyPrefix . $entry->getUniqueIdentifier());
-        $entry->reverseSequence();
-        
+        $writer->write($protein);
+
+        $decoy = clone $protein;
+        $decoy->clearDatabaseEntries();
+
+        foreach ($protein->getDatabaseEntries() as $dbEntry) {
+            $decoyDbKey = $decoyPrefix . $dbEntry->getDatabase()->getPrefix();
+
+            if (! isset($databases[$decoyDbKey])) {
+                $database = new DefaultDatabase();
+                $database->setPrefix($decoyDbKey);
+                $databases[$decoyDbKey] = $database;
+            }
+
+            $decoyEntry = new DatabaseEntry($databases[$decoyDbKey]);
+            $decoyEntry->setUniqueIdentifier($dbEntry->getUniqueIdentifier());
+            $decoy->addDatabaseEntry($decoyEntry);
+        }
+
+        $decoy->setIsDecoy(true);
+
+        $decoy->reverseSequence();
+
         // Write decoy
-        $writer->write($entry);
+        $writer->write($decoy);
     }
-    
+
     $writer->close();
-    
+
     exit();
 }
 ?>

@@ -5,8 +5,6 @@ use pgb_liv\php_ms\Utility\Filter\FilterCharge;
 use pgb_liv\php_ms\Utility\Filter\FilterMass;
 use pgb_liv\php_ms\Utility\Filter\FilterRetentionTime;
 
-error_reporting(E_ALL);
-ini_set('display_errors', true);
 set_time_limit(3600);
 
 define('FORM_FILE', 'mgf');

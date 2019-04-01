@@ -131,7 +131,6 @@ foreach ($raw as $spectra) {
 
 $mzidentml = MzIdentMlReaderFactory::getReader($mzIdentMlFile);
 
-$noIdentTitle = false;
 foreach ($mzidentml->getAnalysisData() as $spectra) {
     foreach ($spectra->getIdentifications() as $identification) {
         $identification->getPeptide()->setSequence(

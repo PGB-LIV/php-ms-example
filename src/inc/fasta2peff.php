@@ -2,7 +2,7 @@
 use pgb_liv\php_ms\Reader\FastaReader;
 use pgb_liv\php_ms\Core\Modification;
 use pgb_liv\php_ms\Writer\FastaWriter;
-use pgb_liv\php_ms\Core\Database\Fasta\PeffFastaEntry;
+use pgb_liv\php_ms\Reader\FastaEntry\PeffFastaEntry;
 
 define('FORM_FILE', 'fasta');
 
@@ -12,11 +12,11 @@ function getModData(Modification $mod, $obo)
     foreach ($obo as $line) {
         $line = trim($line);
         $kvp = explode(': ', $line);
-        
+
         if (isset($kvp[1]) && $kvp[1] == $mod->getName()) {
             $idFound = true;
         }
-        
+
         if ($idFound) {
             switch ($kvp[0]) {
                 case 'name':
@@ -32,10 +32,9 @@ function getModData(Modification $mod, $obo)
                             $mod->setAverageMass((float) $cleanValue);
                             break;
                         case 'Origin':
-                            $mod->setResidues(
-                                array(
-                                    $cleanValue
-                                ));
+                            $mod->setResidues(array(
+                                $cleanValue
+                            ));
                             break;
                         default:
                             // Ignore all else
@@ -56,19 +55,19 @@ if (! empty($_FILES) && $_FILES[FORM_FILE]['error'] == 0) {
     if ($_FILES[FORM_FILE]['error'] != 0) {
         die('Upload Error: ' . $_FILES[FORM_FILE]['error']);
     }
-    
+
     header('Content-type: text/plain;');
-    
+
     $fastaFile = $_FILES[FORM_FILE]['tmp_name'];
     $reader = new FastaReader($fastaFile);
     $writer = new FastaWriter('php://output', new PeffFastaEntry());
-    
+
     foreach ($reader as $entry) {
         $writer->write($entry);
     }
-    
+
     $writer->close();
-    
+
     exit();
 }
 ?>
