@@ -45,72 +45,71 @@ if (! empty($_FILES) && ($_FILES[FORM_IDENT]['error'] != 0 || $_FILES[FORM_RAW][
 if (! empty($_FILES) && $_FILES[FORM_IDENT]['error'] == 0 && $_FILES[FORM_RAW]['error'] == 0) {
     $name = $_FILES[FORM_IDENT]['name'];
     $mzIdentMlFile = $_FILES[FORM_IDENT]['tmp_name'];
-    
+
     if (substr_compare($_FILES[FORM_IDENT]['name'], '.gz', strlen($_FILES[FORM_IDENT]['name']) - 3) === 0) {
         // This input should be from somewhere else, hard-coded in this example
         $file_name = $_FILES[FORM_IDENT]['tmp_name'];
-        
+
         // Raising this value may increase performance
         // read 4kb at a time
         $buffer_size = 4096;
         $out_file_name = $file_name . '_decom';
-        
+
         // Open our files (in binary mode)
         $file = gzopen($file_name, 'rb');
         $out_file = fopen($out_file_name, 'wb');
-        
+
         // Keep repeating until the end of the input file
         while (! gzeof($file)) {
             // Read buffer-size bytes
             // Both fwrite and gzread and binary-safe
             fwrite($out_file, gzread($file, $buffer_size));
         }
-        
+
         // Files are done, close files
         fclose($out_file);
         gzclose($file);
-        
+
         $mzIdentMlFile = $out_file_name;
     }
-    
+
     ?>
 <h3><?php echo $name; ?></h3>
 
 <?php
     $spectraLookup = array();
-    
+
     $raw = new MgfReader($_FILES[FORM_RAW]['tmp_name']);
     $count = 0;
     foreach ($raw as $spectra) {
         $spectraLookup['index=' . $count] = $spectra;
         $count ++;
     }
-    
+
     $mzidentml = MzIdentMlReaderFactory::getReader($mzIdentMlFile);
-    
+
     foreach ($mzidentml->getAnalysisData() as $spectra) {
         foreach ($spectra->getIdentifications() as $identification) {
             $identification->getPeptide()->setSequence(
                 str_replace('X', '', $identification->getPeptide()
                     ->getSequence()));
-            
+
             if (! isset($spectraLookup[$spectra->getIdentifier()])) {
                 continue;
             }
-            
+
             $spectraLookup[$spectra->getIdentifier()]->addIdentification($identification);
         }
     }
-    
+
     $protocolCollection = $mzidentml->getAnalysisProtocolCollection();
-    
+
     $tolerance = null;
     if (isset($protocolCollection['spectrum'])) {
-        foreach ($protocolCollection['spectrum'] as $key => $protocol) {
+        foreach ($protocolCollection['spectrum'] as $protocol) {
             if (isset($protocol['fragmentTolerance'])) {
                 $tolerance = $protocol['fragmentTolerance'][0];
             } elseif (isset($protocol['additions']['user']['Instrument'])) {
-                
                 // MS-GF+ specifies an instrument rather than tolerance
                 if ($protocol['additions']['user']['Instrument'] == 'LowRes') {
                     $tolerance = new Tolerance(0.6, Tolerance::DA);
@@ -118,19 +117,19 @@ if (! empty($_FILES) && $_FILES[FORM_IDENT]['error'] == 0 && $_FILES[FORM_RAW]['
             }
         }
     }
-    
+
     if (is_null($tolerance)) {
         $tolerance = new Tolerance(10, Tolerance::PPM);
     }
-    
+
     echo 'Fragment Tolerance: ' . $tolerance->getTolerance() . $tolerance->getUnit() . '<br />';
-    
+
     echo '<table style="font-size:0.75em;" class="formattedTable hoverableRow"><thead><tr><th>Scan</th><th>Sequence</th><th>B Ions</th><th>Y Ions</th></tr></thead><tbody>';
     foreach ($spectraLookup as $spectra) {
         if (count($spectra->getIdentifications()) == 0) {
             continue;
         }
-        
+
         foreach ($spectra->getIdentifications() as $identification) {
             $bIons = (new BFragment($identification->getSequence()))->getIons();
             $yIons = (new YFragment($identification->getSequence()))->getIons();
@@ -138,7 +137,7 @@ if (! empty($_FILES) && $_FILES[FORM_IDENT]['error'] == 0 && $_FILES[FORM_RAW]['
             foreach ($spectra->getFragmentIons() as $ion) {
                 $fragIons[] = $ion->getMonoisotopicMassCharge();
             }
-            
+
             $bMatches = array();
             foreach ($fragIons as $fragIon) {
                 foreach ($bIons as $bIndex => $bIon) {
@@ -151,7 +150,7 @@ if (! empty($_FILES) && $_FILES[FORM_IDENT]['error'] == 0 && $_FILES[FORM_RAW]['
                     }
                 }
             }
-            
+
             $yMatches = array();
             foreach ($fragIons as $fragIon) {
                 foreach ($yIons as $index => $yIon) {
@@ -164,7 +163,7 @@ if (! empty($_FILES) && $_FILES[FORM_IDENT]['error'] == 0 && $_FILES[FORM_RAW]['
                     }
                 }
             }
-            
+
             echo '<tr>';
             echo '<td>' . $spectra->getTitle() . '</td>';
             echo '<td>' . $identification->getPeptide()->getSequence() . '</td>';
@@ -173,6 +172,6 @@ if (! empty($_FILES) && $_FILES[FORM_IDENT]['error'] == 0 && $_FILES[FORM_RAW]['
             echo '</tr>';
         }
     }
-    
+
     echo '</tbody></table>';
 }

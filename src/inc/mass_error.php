@@ -12,37 +12,37 @@ ini_set('memory_limit', '8G');
 
 if (isset($_GET['file'])) {
     header('Content-Disposition: attachment; filename="' . $_GET['name'] . '"');
-    
+
     $precursorTolerance = new Tolerance((float) $_GET['precursor'], Tolerance::PPM);
-    
+
     $fragmentTolerance = null;
     if (isset($_GET['fragment'])) {
         $fragmentTolerance = new Tolerance((float) $_GET['fragment'], Tolerance::PPM);
     }
-    
+
     $reader = new MgfReader('/tmp/phpms-' . $_GET['file']);
     $writer = new MgfWriter('php://output');
-    
+
     foreach ($reader as $spectra) {
         $beforeMW = $spectra->getMonoisotopicMass();
-        
+
         $shift = $precursorTolerance->getDaltonDelta($beforeMW);
         $spectra->setMonoisotopicMass($beforeMW - $shift);
-        
+
         if (! is_null($fragmentTolerance)) {
             foreach ($spectra->getFragmentIons() as $fragmentIon) {
                 $beforeMW = $fragmentIon->getMonoisotopicMass();
-                
+
                 $shift = $fragmentTolerance->getDaltonDelta($beforeMW);
                 $fragmentIon->setMonoisotopicMass($beforeMW - $shift);
             }
         }
-        
+
         $writer->write($spectra);
     }
-    
+
     $writer->close();
-    
+
     exit();
 }
 
@@ -90,27 +90,27 @@ $mzIdentMlFile = $_FILES[FORM_IDENT]['tmp_name'];
 if (substr_compare($_FILES[FORM_IDENT]['name'], '.gz', strlen($_FILES[FORM_IDENT]['name']) - 3) === 0) {
     // This input should be from somewhere else, hard-coded in this example
     $file_name = $_FILES[FORM_IDENT]['tmp_name'];
-    
+
     // Raising this value may increase performance
     // read 4kb at a time
     $buffer_size = 4096;
     $out_file_name = $file_name . '_decom';
-    
+
     // Open our files (in binary mode)
     $file = gzopen($file_name, 'rb');
     $out_file = fopen($out_file_name, 'wb');
-    
+
     // Keep repeating until the end of the input file
     while (! gzeof($file)) {
         // Read buffer-size bytes
         // Both fwrite and gzread and binary-safe
         fwrite($out_file, gzread($file, $buffer_size));
     }
-    
+
     // Files are done, close files
     fclose($out_file);
     gzclose($file);
-    
+
     $mzIdentMlFile = $out_file_name;
 }
 ?>
@@ -133,14 +133,13 @@ $mzidentml = MzIdentMlReaderFactory::getReader($mzIdentMlFile);
 
 foreach ($mzidentml->getAnalysisData() as $spectra) {
     foreach ($spectra->getIdentifications() as $identification) {
-        $identification->getPeptide()->setSequence(
-            str_replace('X', '', $identification->getPeptide()
-                ->getSequence()));
-        
+        $identification->getPeptide()->setSequence(str_replace('X', '', $identification->getPeptide()
+            ->getSequence()));
+
         if (! isset($spectraLookup[$spectra->getIdentifier()])) {
             continue;
         }
-        
+
         $spectraLookup[$spectra->getIdentifier()]->addIdentification($identification);
     }
 }
@@ -153,7 +152,6 @@ if (isset($protocolCollection['spectrum'])) {
         if (isset($protocol['fragmentTolerance'])) {
             $fragmentTolerance = $protocol['fragmentTolerance'][0];
         } elseif (isset($protocol['additions']['user']['Instrument'])) {
-            
             // MS-GF+ specifies an instrument rather than tolerance
             if ($protocol['additions']['user']['Instrument'] == 'LowRes') {
                 $fragmentTolerance = new Tolerance(0.6, Tolerance::DA);
@@ -175,101 +173,101 @@ foreach ($spectraLookup as $spectra) {
     if (count($spectra->getIdentifications()) == 0) {
         continue;
     }
-    
+
     $sort = new IdentificationSort(IdentificationSort::SORT_RANK, SORT_ASC);
     $idents = $spectra->getIdentifications();
     $sort->sort($idents, false);
-    
+
     $identification = $idents[0];
-    
+
     if ($identification->getSequence()->isDecoy()) {
         continue;
     }
-    
+
     if ($identification->getSequence()->isModified()) {
         continue;
     }
-    
+
     $bIons = (new BFragment($identification->getSequence()))->getIons();
     $yIons = (new YFragment($identification->getSequence()))->getIons();
     $fragIons = array();
     foreach ($spectra->getFragmentIons() as $ion) {
         $fragIons[] = $ion->getMonoisotopicMassCharge();
     }
-    
+
     foreach ($fragIons as $fragIon) {
-        foreach ($bIons as $bIndex => $bIon) {
+        foreach ($bIons as $bIon) {
             if ($fragmentTolerance->isTolerable($fragIon, $bIon)) {
                 $daDelta = $fragIon - $bIon;
                 $ppmDelta = Tolerance::getDifferencePpm($fragIon, $bIon);
-                
+
                 $key = '' . round($daDelta, 2);
                 if ($key == '-0') {
                     $key = '0';
                 }
-                
+
                 if (! isset($fragmentDaDeltas[$key])) {
                     $fragmentDaDeltas[$key] = 0;
                 }
-                
+
                 $fragmentDaDeltas[$key] ++;
-                
+
                 $key = '' . round($ppmDelta, 1);
                 if (! isset($fragmentPpmDeltas[$key])) {
                     $fragmentPpmDeltas[$key] = 0;
                 }
-                
+
                 $fragmentPpmDeltas[$key] ++;
             }
         }
     }
-    
+
     foreach ($fragIons as $fragIon) {
-        foreach ($yIons as $index => $yIon) {
+        foreach ($yIons as $yIon) {
             if ($fragmentTolerance->isTolerable($fragIon, $yIon)) {
                 $daDelta = $fragIon - $yIon;
                 $ppmDelta = Tolerance::getDifferencePpm($fragIon, $yIon);
-                
+
                 $key = '' . round($daDelta, 2);
                 if ($key == '-0') {
                     $key = '0';
                 }
-                
+
                 if (! isset($fragmentDaDeltas[$key])) {
                     $fragmentDaDeltas[$key] = 0;
                 }
-                
+
                 $fragmentDaDeltas[$key] ++;
-                
+
                 $key = '' . round($ppmDelta, 1);
                 if (! isset($fragmentPpmDeltas[$key])) {
                     $fragmentPpmDeltas[$key] = 0;
                 }
-                
+
                 $fragmentPpmDeltas[$key] ++;
             }
         }
     }
-    
+
     $daDelta = $spectra->getMonoisotopicMass() - $identification->getSequence()->getMonoisotopicMass();
     $ppmDelta = Tolerance::getDifferencePpm($spectra->getMonoisotopicMass(),
         $identification->getSequence()->getMonoisotopicMass());
-    
+
     $key = '' . round($daDelta, 2);
     if ($key == '-0') {
         $key = '0';
     }
-    
+
     if (! isset($daDeltas[$key])) {
         $daDeltas[$key] = 0;
     }
-    
+
     $daDeltas[$key] ++;
     $key = '' . round($ppmDelta, 1);
     if (! isset($ppmDeltas[$key])) {
         $ppmDeltas[$key] = 0;
     }
-    
+
     $ppmDeltas[$key] ++;
 }
 
@@ -300,9 +298,9 @@ $fragmentShift = array_search(max($fragmentPpmDeltas), $fragmentPpmDeltas);
                 if (! $isFirst) {
                     echo ',';
                 }
-                
+
                 echo '[' . $da . ', ' . $freq . ']';
-                
+
                 if ($isFirst) {
                     $isFirst = false;
                 }
@@ -328,9 +326,9 @@ $fragmentShift = array_search(max($fragmentPpmDeltas), $fragmentPpmDeltas);
                 if (! $isFirst) {
                     echo ',';
                 }
-                
+
                 echo '[' . $ppm . ', ' . $freq . ']';
-                
+
                 if ($isFirst) {
                     $isFirst = false;
                 }
@@ -358,9 +356,9 @@ $fragmentShift = array_search(max($fragmentPpmDeltas), $fragmentPpmDeltas);
                 if (! $isFirst) {
                     echo ',';
                 }
-                
+
                 echo '[' . $da . ', ' . $freq . ']';
-                
+
                 if ($isFirst) {
                     $isFirst = false;
                 }
@@ -386,9 +384,9 @@ $fragmentShift = array_search(max($fragmentPpmDeltas), $fragmentPpmDeltas);
                 if (! $isFirst) {
                     echo ',';
                 }
-                
+
                 echo '[' . $ppm . ', ' . $freq . ']';
-                
+
                 if ($isFirst) {
                     $isFirst = false;
                 }
