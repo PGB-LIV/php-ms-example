@@ -74,13 +74,11 @@ if (! empty($_FILES) && $_FILES['fasta']['error'] != 0) {
 
         echo '</tr></thead><tbody>';
         foreach ($proteins as $protein) {
-            $databases = $protein->getDatabaseEntries();
+            $database = $protein->getDatabaseEntry();
 
             echo '<tr><td>';
-            foreach ($databases as $database) {
-                echo '<span title="' . $database->getDatabase()->getName() . '">' . $database->getUniqueIdentifier() .
-                    '</span>';
-            }
+            echo '<span title="' . $database->getDatabase()->getName() . '">' . $database->getUniqueIdentifier() .
+                '</span>';
             echo '</td><td>';
             echo $protein->getDescription();
             echo '</td>';

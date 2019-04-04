@@ -2,7 +2,6 @@
 use pgb_liv\php_ms\Reader\FastaReader;
 use pgb_liv\php_ms\Core\Modification;
 use pgb_liv\php_ms\Writer\FastaWriter;
-use pgb_liv\php_ms\Reader\FastaEntry\PeffFastaEntry;
 
 define('FORM_FILE', 'fasta');
 
@@ -56,13 +55,19 @@ if (! empty($_FILES) && $_FILES[FORM_FILE]['error'] == 0) {
         die('Upload Error: ' . $_FILES[FORM_FILE]['error']);
     }
 
+    $pathInfo = pathinfo($_FILES[FORM_FILE]['name']);
+
+    header('Content-Disposition: attachment; filename="' . basename($pathInfo['filename']) . '.peff"');
     header('Content-type: text/plain;');
 
     $fastaFile = $_FILES[FORM_FILE]['tmp_name'];
+
     $reader = new FastaReader($fastaFile);
-    $writer = new FastaWriter('php://output', new PeffFastaEntry());
+    $writer = new FastaWriter('php://output');
+    $writer->setConversionSource(basename($_FILES[FORM_FILE]['name']));
 
     foreach ($reader as $entry) {
+
         $writer->write($entry);
     }
 
