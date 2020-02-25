@@ -37,14 +37,14 @@ $modifications = array();
 for ($i = 0; $i < count($modificationPositions); $i ++) {
     $mass = (float) ($modificationMasses[$i]);
     $location = trim($modificationPositions[$i]);
-    
+
     if (strlen($location) == 0) {
         continue;
     }
-    
+
     $modification = new Modification();
     $modification->setMonoisotopicMass($mass);
-    
+
     if (is_numeric($location)) {
         $modification->setLocation((int) $location);
     } else {
@@ -52,7 +52,7 @@ for ($i = 0; $i < count($modificationPositions); $i ++) {
             trim($location)
         ));
     }
-    
+
     $modifications[] = $modification;
 }
 
@@ -63,8 +63,9 @@ if (isset($_REQUEST['fragmentMethod'])) {
 ?>
 <h2>MS Fragment Ion Generator</h2>
 
-<p>Generates the fragment ions for a specified sequence. You can generate
-    for multiple sequence by seperating each sequence with a new line.</p>
+<p>Generates the fragment ions for a specified sequence. You can
+    generate for multiple sequence by seperating each sequence with a
+    new line.</p>
 <p>Modifications can be input using either a location or a residue, and
     a mass. Each modification should be seperated by a new line. Use [
     and ] for N and C terminus.</p>
@@ -79,12 +80,12 @@ if (isset($_REQUEST['fragmentMethod'])) {
             id="charge">
         
         <?php
-        for ($i = 1; $i <= 9; $i ++) {
+        for ($i = 0; $i <= 9; $i ++) {
             echo '<option value="' . $i . '"';
             if ($charge == $i) {
                 echo ' selected="selected"';
             }
-            
+
             echo '>+' . $i . '</option>';
         }
         ?>
@@ -122,7 +123,7 @@ foreach ($sequences as $sequence) {
     foreach ($modifications as $modification) {
         $peptide->addModification($modification);
     }
-    
+
     echo '<h3>' . wordwrap($peptide->getSequence(), 64, '<br />', true) . '</h3>';
     echo 'Length: ' . $peptide->getLength() . '<br />';
     echo 'Mass: ' . number_format($mass, 4) . 'Da<br />';
@@ -130,13 +131,13 @@ foreach ($sequences as $sequence) {
         echo 'Mass (Inc. Modifications): ' . number_format($peptide->getMonoisotopicMass(), 4) . 'Da<br />';
     }
     echo 'Formula: ' . preg_replace('/([0-9]+)/', '<sub>$1</sub>', $peptide->getMolecularFormula()) . '<br /><br />';
-    
+
     if ($fragmentMethod == 'All') {
         $frags = array();
         $frags['a'] = new AFragment($peptide);
         $frags['b'] = new BFragment($peptide);
         $frags['c'] = new CFragment($peptide);
-        
+
         $frags['x'] = new XFragment($peptide);
         $frags['y'] = new YFragment($peptide);
         $frags['z'] = new ZFragment($peptide);
@@ -187,27 +188,27 @@ foreach ($sequences as $sequence) {
         echo '<tr>';
         echo '<td>' . $sequence[$i - 1] . '</td>';
         echo '<td>' . $i . '</td>';
-        
+
         foreach ($frags as $type => $fragger) {
             $ions = $fragger->getIons($charge);
-            
+
             $ionIndex = $i;
             $sequenceIndex = $i;
             if ($fragger->isReversed()) {
                 $sequenceIndex = $peptide->getLength() - ($i - 1);
                 $ionIndex = $peptide->getLength() - ($i - 1);
             }
-            
+
             $ion = '&empty;';
             if (isset($ions[$ionIndex])) {
                 $ion = $ions[$ionIndex];
-                
+
                 $ion = number_format($ion, 6);
             }
-            
+
             echo '<td>' . $ion . '</td>';
         }
-        
+
         echo '<td>' . ($peptide->getLength() + 1 - $i) . '</td>';
         echo '</tr>';
     }
