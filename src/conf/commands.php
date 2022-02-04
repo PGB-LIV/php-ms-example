@@ -13,3 +13,4 @@ $_COMMANDS['coverage'] = 'Sequence Coverage';
 $_COMMANDS['mzid2probed'] = 'mzIdentML to proBed';
 $_COMMANDS['spectra_annotator'] = 'Spectra Annotator';
 $_COMMANDS['mass_error'] = 'Mass Error Correction';
+$_COMMANDS['sequence_predict'] = 'Sequence Predictor';
